@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 972fc3dcd77baa7468a50abbab0beb0b, type: 3}
+  m_Name: CollectBread
+  m_EditorClassIdentifier: 
+  <id>k__BackingField: CollectBread
+  displayName: Collect 3 loafs of bread
+  description: 'Please bring me some bread. I''ll pay you for it plus some extra
+    :)
+
+
+    ~ Samuel'
+  questGiver: Samuel
+  levelRequired: 1
+  questPrerequisites: []
+  questStepPrefabs:
+  - {fileID: 800678186288328544, guid: 09b45a3dbe315104396a5f6ccab2dc78, type: 3}
+  - {fileID: 4406440123564917686, guid: 230aefc6ef576d743b51e6cd85672972, type: 3}
+  questStepNames:
+  - Collect 3 loafs of bread
+  - Deliver Bread
+  xpReward: 12
+  bronzeReward: 9
+  silverReward: 0
+  goldReward: 0

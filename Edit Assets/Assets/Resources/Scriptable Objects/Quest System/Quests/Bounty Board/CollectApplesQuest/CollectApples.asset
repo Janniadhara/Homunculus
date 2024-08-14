@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 972fc3dcd77baa7468a50abbab0beb0b, type: 3}
+  m_Name: CollectApples
+  m_EditorClassIdentifier: 
+  <id>k__BackingField: CollectApples
+  displayName: Collect 5 Apples
+  description: 'If someone brings me 5 apples, i''ll bake you a nice apple pie
+
+
+    ~Miranda
+
+'
+  questGiver: Miranda
+  levelRequired: 1
+  questPrerequisites: []
+  questStepPrefabs:
+  - {fileID: 8103079879081464789, guid: aca5c921899de724089671f4e075e561, type: 3}
+  - {fileID: 4406440123564917686, guid: f6d825b92597ce746b8624612169efb7, type: 3}
+  questStepNames:
+  - Collect 5 apples
+  - Deliver the apples
+  xpReward: 10
+  bronzeReward: 4
+  silverReward: 0
+  goldReward: 0

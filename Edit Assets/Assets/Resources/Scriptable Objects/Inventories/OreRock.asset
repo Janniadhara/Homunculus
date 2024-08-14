@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea8391cdfb50a8c40a2b31efe27fce04, type: 3}
+  m_Name: OreRock
+  m_EditorClassIdentifier: 
+  ItemDatabase: {fileID: 11400000, guid: a62ade73c9729184b8c967d95355eaa3, type: 2}
+  InventoryList:
+  - id: 51
+    item: {fileID: 11400000, guid: f05eeb6f4d5ed59498d8a7fa92fd43b1, type: 2}
+    amount: 1
+  - id: 50
+    item: {fileID: 11400000, guid: 3d74efe55493af34da2ca9d5a81902a3, type: 2}
+    amount: 2

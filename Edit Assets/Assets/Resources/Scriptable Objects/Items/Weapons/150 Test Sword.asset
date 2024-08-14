@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c5c9756259706e4db29873d41d73c65, type: 3}
+  m_Name: 150 Test Sword
+  m_EditorClassIdentifier: 
+  itemName: Test Sword
+  itemId: 150
+  Prefab: {fileID: 4502803091766823537, guid: 79bc5998034d79b47adce662b000fffa, type: 3}
+  Picture: {fileID: 21300000, guid: 5fd50594014b70e48bd6993443d46b32, type: 3}
+  type: 3
+  description: 'Test Sword
+
+'
+  damageValue: 35
+  weaponAnimations: {fileID: 22100000, guid: 9898bc2ae456f92449dc2a13759d6836, type: 2}

@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 972fc3dcd77baa7468a50abbab0beb0b, type: 3}
+  m_Name: Kill5Slimes
+  m_EditorClassIdentifier: 
+  <id>k__BackingField: Kill5Slimes
+  displayName: Kill 5 Slimes
+  description: Folluin wants you to kill 5 slimes and bring him their cores.
+  questGiver: Folluin
+  levelRequired: 0
+  questPrerequisites: []
+  questStepPrefabs:
+  - {fileID: 6593922454244018303, guid: d7945fa8bac3e4d428a75ea2ebeca0c0, type: 3}
+  - {fileID: 4133033630772537172, guid: f03030acc3e88ea469e53730ff78caad, type: 3}
+  questStepNames: []
+  xpReward: 10
+  bronzeReward: 20
+  silverReward: 0
+  goldReward: 0

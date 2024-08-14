@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f0649bbbc121a541808617b8aeb4de5, type: 3}
+  m_Name: 901 Collydrite
+  m_EditorClassIdentifier: 
+  itemName: Collydrite
+  itemId: 901
+  Prefab: {fileID: 7209794899283987035, guid: fb02a8f4446d7bb4ba24017972b63ae9, type: 3}
+  Picture: {fileID: 21300000, guid: 5c616c8ce077d674f915d835b8f84134, type: 3}
+  type: 2
+  description: 

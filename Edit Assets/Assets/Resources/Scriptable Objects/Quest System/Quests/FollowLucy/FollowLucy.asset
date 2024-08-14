@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 972fc3dcd77baa7468a50abbab0beb0b, type: 3}
+  m_Name: FollowLucy
+  m_EditorClassIdentifier: 
+  <id>k__BackingField: FollowLucy
+  displayName: Follow Lucy
+  description: Follow Lucy to her house and talk to her mother.
+  questGiver: Lucy
+  levelRequired: 0
+  questPrerequisites: []
+  questStepPrefabs:
+  - {fileID: 8771288899216143603, guid: e329c483cce5af74fb0be66f07ede00e, type: 3}
+  - {fileID: 7475458298282156866, guid: eccd06302c2e0db46a38e6a0c35f061c, type: 3}
+  questStepNames:
+  - Follow Lucy
+  - Talk to Lucy's mother
+  xpReward: 10
+  bronzeReward: 0
+  silverReward: 0
+  goldReward: 0

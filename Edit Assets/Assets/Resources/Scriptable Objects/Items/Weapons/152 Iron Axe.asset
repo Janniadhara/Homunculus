@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c5c9756259706e4db29873d41d73c65, type: 3}
+  m_Name: 152 Iron Axe
+  m_EditorClassIdentifier: 
+  itemName: Iron Axe
+  itemId: 152
+  Prefab: {fileID: 7075340416849857643, guid: d05bafd2aae1a7d49bac23e899234088, type: 3}
+  Picture: {fileID: 21300000, guid: 172774604c1bee84185a69041576525b, type: 3}
+  type: 3
+  description: This sturdy sword is made of solid iron and has a straight blade that's
+    sharpened to a fine edge. The hilt is wrapped in a rough leather grip that provides
+    a firm hold, even in sweaty or bloody hands. When you swing the sword, you feel
+    its weight and balance, and hear the satisfying whoosh of air as it cuts through
+    the air.
+  damageValue: 50
+  weaponAnimations: {fileID: 22100000, guid: 9898bc2ae456f92449dc2a13759d6836, type: 2}

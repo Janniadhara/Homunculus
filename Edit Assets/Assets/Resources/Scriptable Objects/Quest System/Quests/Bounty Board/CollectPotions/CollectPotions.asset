@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 972fc3dcd77baa7468a50abbab0beb0b, type: 3}
+  m_Name: CollectPotions
+  m_EditorClassIdentifier: 
+  <id>k__BackingField: CollectPotions
+  displayName: Collect Potions
+  description: 'I need Potions. Please get me 2 health, 2 mana and 2 stamina potions
+
+
+    ~
+    Samantha'
+  questGiver: Samantha
+  levelRequired: 1
+  questPrerequisites: []
+  questStepPrefabs:
+  - {fileID: 4687324782399758357, guid: c165843f044d96e45a9c3c59c7d4a8b0, type: 3}
+  - {fileID: 4687324782399758357, guid: 6500de304b118d744aa7e37f97294bac, type: 3}
+  - {fileID: 4687324782399758357, guid: e7cb602109c7182489bfec40a6866c0b, type: 3}
+  - {fileID: 4406440123564917686, guid: 560255389298a8a499f41c01c433d520, type: 3}
+  questStepNames:
+  - Collect 2 health potions
+  - Collect 2 mana potions
+  - Collect 2 stamina potions
+  - Deliver Potions
+  xpReward: 25
+  bronzeReward: 0
+  silverReward: 8
+  goldReward: 0

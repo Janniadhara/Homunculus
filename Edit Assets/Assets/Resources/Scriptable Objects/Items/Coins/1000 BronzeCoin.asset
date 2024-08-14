@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cdeedcc8a122dd349845f55a266ccc0a, type: 3}
+  m_Name: 1000 BronzeCoin
+  m_EditorClassIdentifier: 
+  itemName: BronzeCoin
+  itemId: 1000
+  Prefab: {fileID: 5674517378802897187, guid: a74b41eb1ba552f45a2045caa76e79b4, type: 3}
+  Picture: {fileID: 21300000, guid: d6032d13c4ee8c441b8173423b65deb2, type: 3}
+  type: 11
+  description: 
+  valueBronze: 1
+  valueSilver: 0
+  valueGold: 0

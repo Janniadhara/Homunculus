@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c5c9756259706e4db29873d41d73c65, type: 3}
+  m_Name: 154 Iron Hammer
+  m_EditorClassIdentifier: 
+  itemName: Iron Hammer
+  itemId: 154
+  Prefab: {fileID: 7075340416849857643, guid: 8334cadac44367d4bb4797056f02af08, type: 3}
+  Picture: {fileID: 21300000, guid: af50dc4fa7b6d314895d0f8c79adb4a5, type: 3}
+  type: 3
+  description: This sturdy sword is made of solid iron and has a straight blade that's
+    sharpened to a fine edge. The hilt is wrapped in a rough leather grip that provides
+    a firm hold, even in sweaty or bloody hands. When you swing the sword, you feel
+    its weight and balance, and hear the satisfying whoosh of air as it cuts through
+    the air.
+  damageValue: 65
+  weaponAnimations: {fileID: 22100000, guid: f4b73d3069dfc364b99e6921f4ca0d07, type: 2}
+  weaponType: 1

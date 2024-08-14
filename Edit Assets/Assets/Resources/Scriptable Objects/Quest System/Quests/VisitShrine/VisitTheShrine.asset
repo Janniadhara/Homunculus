@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 972fc3dcd77baa7468a50abbab0beb0b, type: 3}
+  m_Name: VisitTheShrine
+  m_EditorClassIdentifier: 
+  <id>k__BackingField: VisitTheShrine
+  displayName: Visit the shrine outside the village
+  description: 
+  questGiver: 
+  levelRequired: 2
+  questPrerequisites:
+  - {fileID: 11400000, guid: 4f8b9aaf8ccfffc45a352d0e8842a429, type: 2}
+  questStepPrefabs:
+  - {fileID: 57674558354632377, guid: 3432c036fca409b48b44b16b82b4eb8f, type: 3}
+  - {fileID: 57674558354632377, guid: 3b6735139fd9c1f42b18539b3a640f60, type: 3}
+  - {fileID: 57674558354632377, guid: f20593a8a18a26843b188fa070c15b7c, type: 3}
+  questStepNames: []
+  xpReward: 10
+  bronzeReward: 0
+  silverReward: 2
+  goldReward: 0

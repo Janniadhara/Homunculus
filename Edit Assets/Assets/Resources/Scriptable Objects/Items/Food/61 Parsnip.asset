@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306632dc1bac9aa4e81e5bd88276061b, type: 3}
+  m_Name: 61 Parsnip
+  m_EditorClassIdentifier: 
+  itemName: Parsnip
+  itemId: 61
+  Prefab: {fileID: 7075340416849857643, guid: 9e3781f4597685c48b2fea2f954028cc, type: 3}
+  Picture: {fileID: 21300000, guid: 94353f5e8ae46474ea9c603206f62d00, type: 3}
+  type: 1
+  description: 
+  restoreHealth: 5
+  restoreMana: 5
+  restoreStamina: 0

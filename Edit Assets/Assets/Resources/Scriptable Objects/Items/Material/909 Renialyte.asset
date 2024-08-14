@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f0649bbbc121a541808617b8aeb4de5, type: 3}
+  m_Name: 909 Renialyte
+  m_EditorClassIdentifier: 
+  itemName: Renialyte
+  itemId: 909
+  Prefab: {fileID: 7209794899283987035, guid: 4e42641266d4e4349a58160e942ae949, type: 3}
+  Picture: {fileID: 21300000, guid: b2e89b740f2098e43800f24b3f35080d, type: 3}
+  type: 2
+  description: 
