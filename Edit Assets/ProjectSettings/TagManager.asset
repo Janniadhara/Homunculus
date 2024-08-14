@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - CinemachineTarget
+  - Container
+  - NPC
+  - WeaponSlotR
+  - WeaponSlotL
+  - PlayerModel
+  - Item
+  - Door
+  - Terrain
+  - Stone
+  - Wood
+  - Grass
+  - Music
+  - SpawnPoint
+  - Harvestable
+  - QuestBoard
+  - Obstacle
+  - Mineral
+  - Animal
+  - Water
+  - MainWeaponSlot
+  - Dungeon
+  - MapScreen
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - MiniMap
+  - Water
+  - UI
+  - MiniMap Ignore
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
