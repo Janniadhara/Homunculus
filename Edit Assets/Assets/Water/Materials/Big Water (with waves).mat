@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Big Water (with waves)
+  m_Shader: {fileID: -6465566751694194690, guid: f1cfad12ee5d0ba4dbbbf2a4a7ae14ec, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Ints: []
+    m_Floats:
+    - _BUILTIN_QueueControl: 0
+    - _BUILTIN_QueueOffset: 0
+    - _DepthDistance: 20.83
+    - _FlowingSpeed: 1
+    - _FoamAmount: 0.25
+    - _FoamCutOff: 0.97
+    - _FoamScale: 200
+    - _FoamSpeed: 0.5
+    - _RefractionScale: 1
+    - _RefractionSpeed: 1
+    - _RefractionStrength: 2
+    - _RippleDensity: 14
+    - _RippleSlimness: 5
+    - _RippleSpeed: 0.5
+    - _WaveDensity: 0
+    - _WaveSpeed: 0
+    m_Colors:
+    - _DeepWater: {r: 0, g: 0.01032122, b: 0.6792453, a: 0.6}
+    - _FoamColor: {r: 1, g: 1, b: 1, a: 0.8}
+    - _RippleColor: {r: 0.3529412, g: 1.372549, b: 1.905882, a: 0.6}
+    - _WaterColor: {r: 0.09669811, g: 0.3427089, b: 0.5, a: 0.6}
+  m_BuildTextureStacks: []
+--- !u!114 &854284200282441439
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 639247ca83abc874e893eb93af2b5e44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 0
