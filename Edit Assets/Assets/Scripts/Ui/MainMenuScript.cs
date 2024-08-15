@@ -21,23 +21,28 @@ public class MainMenuScript : MonoBehaviour
     public void CreateNewGame()
     {
         DisableButtons();
+        DataPersistenceManager.Instance.TransitionScene();
         DataPersistenceManager.Instance.NewGame();
+        DataPersistenceManager.Instance.TransitionScene();
         SceneManager.LoadSceneAsync("SampleScene");
     }
     public void ContinueGame()
     {
         DisableButtons();
+        DataPersistenceManager.Instance.TransitionScene();
         //DataPersistenceManager.Instance.LoadGame();
         // -> don't need that cause loading a scene loads the game data
         SceneManager.LoadSceneAsync("SampleScene");
     }
     public void QuitGame()
     {
+        DisableButtons();
         Application.Quit();
     }
     private void DisableButtons()
     {
         newGameButton.interactable = false;
         continueGameButton.interactable = false;
+        quitGameButton.interactable = false;
     }
 }

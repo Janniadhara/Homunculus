@@ -594,9 +594,37 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1448972371413336940, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: m_Color.a
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7834269839472688968, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
       propertyPath: m_Name
       value: DataPersistenceManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7834269839472688969, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: fadeSpeed
+      value: 1.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7834269839472688969, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: TransitionImage
+      value: 
+      objectReference: {fileID: 1520277284}
+    - target: {fileID: 7834269839472688969, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: TransitionColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7834269839472688969, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: TransitionColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7834269839472688969, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: TransitionColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7834269839472688969, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: TransitionColor.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7834269839472688970, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1044,6 +1072,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1179042489}
   m_CullTransparentMesh: 1
+--- !u!114 &1520277284 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1448972371413336940, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+  m_PrefabInstance: {fileID: 594512427}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1687214538
 GameObject:
   m_ObjectHideFlags: 0
@@ -1396,7 +1435,7 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 594512427}
+  - {fileID: 332415519}
   - {fileID: 1987877557}
   - {fileID: 276200438}
-  - {fileID: 332415519}
   - {fileID: 2050938238}

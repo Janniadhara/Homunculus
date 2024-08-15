@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class DataPersistenceManager : MonoBehaviour
 {
@@ -20,6 +21,13 @@ public class DataPersistenceManager : MonoBehaviour
     public ItemDatabaseObject Itemdatabase;
     public Object[] LoadedItems;
 
+    [Header("Transition")]
+    [SerializeField] private GameObject TransitionCanvas;
+    [SerializeField] private Image TransitionImage;
+    [SerializeField] private Color TransitionColor;
+    [SerializeField] private float fadeSpeed;
+    private bool fadeOut = false;
+
     private void Awake()
     {
         if (Instance != null)
@@ -31,6 +39,8 @@ public class DataPersistenceManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
         dataHandler = new FileDataHandler(Application.persistentDataPath + "/Saves", fileName);
+        TransitionCanvas.SetActive(false);
+        TransitionColor.a = 1f;
     }
     private void OnEnable()
     {
@@ -44,13 +54,30 @@ public class DataPersistenceManager : MonoBehaviour
         SceneManager.sceneUnloaded -= OnSceneUnloaded;
         //EventsManager.Instance.saveGameEvent.onSaveGame -= SaveGame;
     }
-    
+    private void Update()
+    {
+        if (fadeOut && TransitionColor.a > 0)
+        {
+            TransitionColor.a -= fadeSpeed * Time.deltaTime;
+            TransitionImage.color = TransitionColor;
+        }
+        if (TransitionColor.a <= 0)
+        {
+            TransitionCanvas.SetActive(false);
+            TransitionColor.a = 1f;
+            TransitionImage.color = TransitionColor;
+            fadeOut = false;
+        }
+    }
+
     public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         dataPersistenceObjects = FindAllDataPersistenceObjects();
         LoadItemDatabase();
         LoadGame();
         Debug.Log(SceneManager.GetActiveScene().name);
+
+        fadeOut = true;
     }
     public void OnSceneUnloaded(Scene scene)
     {
@@ -140,5 +167,9 @@ public class DataPersistenceManager : MonoBehaviour
     public bool HasGameData()
     {
         return gameData != null;
+    }
+    public void TransitionScene()
+    {
+        TransitionCanvas.SetActive(true);
     }
 }

@@ -11,6 +11,7 @@ public class EnterExitDungeon : MonoBehaviour
     {
         if (SceneNameToTransitionTo != null)
         {
+            DataPersistenceManager.Instance.TransitionScene();
             SceneManager.LoadSceneAsync(SceneNameToTransitionTo);
         }
     }
