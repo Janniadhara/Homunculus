@@ -44,10 +44,21 @@ public class SoundManager : MonoBehaviour, IDataPersistence
             return;
         }
         Instance = this;
+        //EventsManager.Instance.playSoundEvent.onPlayOneShot += PlayEffect;
+    }
+    private void OnEnable()
+    {
         EventsManager.Instance.dayEvent.onDayTime += SetDay;
         EventsManager.Instance.dayEvent.onNightTime += SetNight;
         EventsManager.Instance.levelUpEvent.onLevelUp += LevelUp;
-        //EventsManager.Instance.playSoundEvent.onPlayOneShot += PlayEffect;
+        EventsManager.Instance.pauseGameEvent.onPauseGame += PauseSounds;
+    }
+    private void OnDisable()
+    {
+        EventsManager.Instance.dayEvent.onDayTime -= SetDay;
+        EventsManager.Instance.dayEvent.onNightTime -= SetNight;
+        EventsManager.Instance.levelUpEvent.onLevelUp -= LevelUp;
+        EventsManager.Instance.pauseGameEvent.onPauseGame -= PauseSounds;
     }
     public void LoadData(GameData data)
     {
@@ -289,7 +300,7 @@ public class SoundManager : MonoBehaviour, IDataPersistence
     }
     public void PlayEffect(AudioClip clip, float volume)
     {
-        EffectSource.PlayOneShot(clip, volume);
+        EffectSource.PlayOneShot(clip, effectVolume);
     }
     #region get/set volume
     public void GetMasterVolume(Slider slider)
@@ -336,6 +347,21 @@ public class SoundManager : MonoBehaviour, IDataPersistence
         {
             EffectSource.PlayOneShot(LevelUpClip);
             curLevel = level;
+        }
+    }
+    private void PauseSounds(bool ispaused)
+    {
+        if (ispaused)
+        {
+            MusicSource.Pause();
+            MusicSource2.Pause();
+            EffectSource.Pause();
+        }
+        else
+        {
+            MusicSource.UnPause();
+            MusicSource2.UnPause();
+            EffectSource.UnPause();
         }
     }
 }

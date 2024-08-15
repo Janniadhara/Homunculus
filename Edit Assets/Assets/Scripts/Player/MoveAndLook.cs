@@ -1,11 +1,15 @@
+using Ink.Runtime;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 public class MoveAndLook : MonoBehaviour, IDataPersistence
 {
-    public GameObject CameraTarget;
+    //public GameObject CameraTarget;
     public GameObject MainCamera;
     public GameObject RaycastOrigin;
     private CharacterController CharacterController;
@@ -96,7 +100,7 @@ public class MoveAndLook : MonoBehaviour, IDataPersistence
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        CameraTarget = GameObject.FindGameObjectWithTag("CinemachineTarget");
+        //CameraTarget = GameObject.FindGameObjectWithTag("CinemachineTarget");
         MainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         CharacterController = GetComponent<CharacterController>();
         CharacterController.enabled = false;
@@ -117,33 +121,45 @@ public class MoveAndLook : MonoBehaviour, IDataPersistence
         #region cam target rotation
         //TODO camera only between -80 and +80 degrees on x-axis
         //= onyl rotate when between 280 - 360 and 0 - 80
-        float xRotation = CameraTarget.transform.eulerAngles.x;
+        //float xRotation = CameraTarget.transform.eulerAngles.x;
         float cameraLeftRight = Input.GetAxis("Mouse X");
-        float cameraUpdown = Input.GetAxis("Mouse Y");
+        float cameraUpdown = Mathf.Clamp(Input.GetAxis("Mouse Y"), -15, 15); //fix for now
+        float xRotation = RaycastOrigin.transform.eulerAngles.x;
+        //dont rotate more that 80 dwon (looking up)
+        if (xRotation > 90 && xRotation < 290 && cameraUpdown > 0)
+        {
+            cameraUpdown = 0;
+        }
+        //dont rotate more that 80 up (looking down)
+        if (xRotation > 70 && xRotation < 90 && cameraUpdown < 0)
+        {
+            cameraUpdown = 0;
+        }
         Vector3 camRotation = new Vector3(cameraUpdown, -cameraLeftRight, 0);
-        Vector3 rayOriginRotation = new Vector3(0, -cameraLeftRight, 0);
+        Vector3 rayOriginRotation = new Vector3(cameraUpdown, -cameraLeftRight, 0);
         if (LookAtTargetScript.canMoveCamera)
         {
-            CameraTarget.transform.eulerAngles -= camRotation;
+            Debug.DrawRay(RaycastOrigin.transform.position, RaycastOrigin.transform.position - MainCamera.transform.position, Color.blue);
+            Debug.DrawRay(RaycastOrigin.transform.position, Vector3.up, Color.blue);
+            Vector3 lookdirection = RaycastOrigin.transform.position - MainCamera.transform.position;
+            Vector3 updirection = RaycastOrigin.transform.position + Vector3.up;
+            float angle = Vector3.Angle(lookdirection, Vector3.up);
+            if (angle < 29)
+            {
+                //RaycastOrigin.transform.eulerAngles = new Vector3(290, RaycastOrigin.transform.eulerAngles.y, RaycastOrigin.transform.eulerAngles.z);
+            }
+            if (angle > 162)
+            {
+                //RaycastOrigin.transform.eulerAngles = new Vector3(70, RaycastOrigin.transform.eulerAngles.y, RaycastOrigin.transform.eulerAngles.z);
+            }
+            //CameraTarget.transform.eulerAngles -= camRotation;
             RaycastOrigin.transform.eulerAngles -= rayOriginRotation;
-            /*
-            if (xRotation > 80 && xRotation < 280)
-            {
-                CameraTarget.transform.rotation = Quaternion.Euler(79, CameraTarget.transform.eulerAngles.y, 0);
-                RaycastOrigin.transform.rotation = Quaternion.Euler(79, RaycastOrigin.transform.eulerAngles.y, 0);
-            }
-            if (xRotation > 90 && xRotation < 280)
-            {
-                CameraTarget.transform.rotation = Quaternion.Euler(281, CameraTarget.transform.eulerAngles.y, 0);
-                RaycastOrigin.transform.rotation = Quaternion.Euler(281, RaycastOrigin.transform.eulerAngles.y, 0);
-            }
-            */
         }
         else
         {
             isMoving = false;
         }
-        float camEulerY = CameraTarget.transform.eulerAngles.y;
+        //float camEulerY = CameraTarget.transform.eulerAngles.y;
         float rayEulerY = RaycastOrigin.transform.eulerAngles.y;
         #endregion
 
@@ -295,7 +311,7 @@ public class MoveAndLook : MonoBehaviour, IDataPersistence
         playerSpeed = Mathf.Clamp01(movementDirection.magnitude) * maxSpeed;
 
         //applay y-rotation of CameraTarget to the movement direction
-        movementDirection = Quaternion.AngleAxis(CameraTarget.transform.rotation.eulerAngles.y, Vector3.up) * movementDirection;
+        movementDirection = Quaternion.AngleAxis(RaycastOrigin.transform.rotation.eulerAngles.y, Vector3.up) * movementDirection;
         
         movementDirection.Normalize();
         if (isGrounded || isSwimming)
@@ -336,8 +352,8 @@ public class MoveAndLook : MonoBehaviour, IDataPersistence
             //set player rotation to CameraTarget rotaion
             transform.rotation = Quaternion.RotateTowards(transform.rotation, toRotationMovement, 500 * Time.deltaTime);
             
-            CameraTarget.transform.localRotation = Quaternion.Euler(
-                CameraTarget.transform.localEulerAngles.x, -transform.eulerAngles.y + camEulerY, 0);
+            //CameraTarget.transform.localRotation = Quaternion.Euler(
+               // CameraTarget.transform.localEulerAngles.x, -transform.eulerAngles.y + camEulerY, 0);
             RaycastOrigin.transform.localRotation = Quaternion.Euler(
                 RaycastOrigin.transform.localEulerAngles.x, -transform.eulerAngles.y + rayEulerY, 0);
         }
