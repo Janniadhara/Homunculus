@@ -107,13 +107,9 @@ public class PlayerAttackEnemies : MonoBehaviour
     }
     private void RotateTowardsLookDirection()
     {
-        float camEulerY = CameraTarget.transform.eulerAngles.y;
         float rayEulerY = RaycastOriginOrigin.transform.eulerAngles.y;
 
-        transform.rotation = Quaternion.Euler(0, camEulerY, 0);
-
-        CameraTarget.transform.localRotation = Quaternion.Euler(
-                CameraTarget.transform.localEulerAngles.x, -transform.eulerAngles.y + camEulerY, 0);
+        transform.rotation = Quaternion.Euler(0, rayEulerY, 0);
         RaycastOriginOrigin.transform.localRotation = Quaternion.Euler(
             RaycastOriginOrigin.transform.localEulerAngles.x, -transform.eulerAngles.y + rayEulerY, 0);
     }
