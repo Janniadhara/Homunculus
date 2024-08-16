@@ -407,8 +407,11 @@ public class LookAtTarget : MonoBehaviour
                     List<InventorySlot> chestInv = currentTarget.GetComponent<ChestInventoryManager>().InventoryList;
                     InventoryManager.Instance.OpenChestInventory(chestInv);
                     InventoryManager.Instance.OpenPlayerInventory();
-                    currentTarget.GetComponent<Animator>().SetBool("b_open", true);
-                    currentTarget.GetComponent<Animator>().SetBool("b_close", false);
+                    if (currentTarget.GetComponent<Animator>() != null)
+                    {
+                        currentTarget.GetComponent<Animator>().SetBool("b_open", true);
+                        currentTarget.GetComponent<Animator>().SetBool("b_close", false);
+                    }
                 }
                 else
                 {
@@ -419,8 +422,11 @@ public class LookAtTarget : MonoBehaviour
                     canMoveCamera = true;
                     InventoryManager.Instance.ClosePlayerInventory();
                     InventoryManager.Instance.CloseChestInventory();
-                    currentTarget.GetComponent<Animator>().SetBool("b_open", false);
-                    currentTarget.GetComponent<Animator>().SetBool("b_close", true);
+                    if (currentTarget.GetComponent<Animator>() != null)
+                    {
+                        currentTarget.GetComponent<Animator>().SetBool("b_open", false);
+                        currentTarget.GetComponent<Animator>().SetBool("b_close", true);
+                    }
                 }
                 CheckInteractions();
             }
