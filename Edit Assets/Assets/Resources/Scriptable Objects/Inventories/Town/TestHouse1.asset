@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemDatabase: {fileID: 11400000, guid: a62ade73c9729184b8c967d95355eaa3, type: 2}
   InventoryList:
-  - id: 1
+  - id: 2
     item: {fileID: 11400000, guid: 60762c1c01d477d4e84c68b7431f0cda, type: 2}
     amount: 20
