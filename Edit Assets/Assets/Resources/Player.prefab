@@ -740,8 +740,6 @@ MonoBehaviour:
   waterSlowingMultiplier: 2
   waterFloatingMultiplier: 0.2
   alwaysSpawnPoint: 0
-  camupdown: 0
-  camtargeteulerangel: 0
 --- !u!114 &4571059926900271896
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5551,7 +5549,7 @@ GameObject:
   - component: {fileID: 4316555630013487788}
   m_Layer: 0
   m_Name: Origin of Raycast Origin
-  m_TagString: Untagged
+  m_TagString: CinemachineTarget
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -6156,7 +6154,7 @@ Camera:
     height: 1
   near clip plane: 0.2
   far clip plane: 300
-  field of view: 40
+  field of view: 60
   orthographic: 0
   orthographic size: 10
   m_Depth: 0
@@ -9530,7 +9528,7 @@ GameObject:
   - component: {fileID: 4531831145573733359}
   m_Layer: 0
   m_Name: Cinemachine Follow
-  m_TagString: CinemachineTarget
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -25962,7 +25960,7 @@ MonoBehaviour:
   m_LookAt: {fileID: 0}
   m_Follow: {fileID: 3435159404963640292}
   m_Lens:
-    FieldOfView: 40
+    FieldOfView: 60
     OrthographicSize: 10
     NearClipPlane: 0.2
     FarClipPlane: 300

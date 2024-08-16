@@ -117,7 +117,7 @@ public class LookAtTarget : MonoBehaviour
             layerMask = ~layerMask;
             if (Physics.Raycast(origin, direction, out RaycastHit hit, interactRange, layerMask))
             {
-                Debug.DrawRay(origin, direction * interactRange, Color.yellow);
+                Debug.DrawRay(origin, direction * 2, Color.yellow);
 
                 currentTarget = hit.transform.gameObject;
                 UpdateInteractText();
@@ -127,7 +127,7 @@ public class LookAtTarget : MonoBehaviour
             //if "löcher in die luft gucken", remove potential outline from last target and set current target null
             else
             {
-                if (currentTarget != null && (lastTarget.tag == "Container" || lastTarget.tag == "Item"))
+                if (currentTarget != null && (lastTarget.CompareTag("Container") || lastTarget.CompareTag("Item")))
                 {
                     lastTarget.transform.gameObject.GetComponent<Outline>().enabled = false;
                     currentTarget = null;

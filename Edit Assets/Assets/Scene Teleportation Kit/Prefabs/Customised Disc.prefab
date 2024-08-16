@@ -29,9 +29,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4351740144821470339}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.72341824, y: -0.027608683, z: 0.026308728, w: 0.6893561}
+  m_LocalRotation: {x: -0.72341704, y: -0.027604017, z: 0.026309432, w: 0.6893574}
   m_LocalPosition: {x: -288.412, y: 9.026, z: -272.774}
-  m_LocalScale: {x: 50, y: 50, z: 300}
+  m_LocalScale: {x: 25, y: 25, z: 25}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7323407535035301885}
@@ -65,7 +65,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fa03a0c5397614643a2d7f6f0f05b88f, type: 2}
+  - {fileID: 2100000, guid: 6469fbbf4afb4454aa1f6b0b3529cd11, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -106,7 +106,7 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 1
+  m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2402055809979137839, guid: 2a4a85747f2cde349ab1b98f674f214c, type: 3}
 --- !u!136 &6822588290138827575
@@ -129,7 +129,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.02
-  m_Height: 0.02
+  m_Height: 0.1
   m_Direction: 2
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-1969184435109125009
@@ -144,6 +144,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30c79fcf19c9bf74cb3ff21ac465c4cb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SceneNameToTransitionTo: SampleScene
 --- !u!1001 &7307534759985871051
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -260,9 +261,33 @@ PrefabInstance:
       propertyPath: ShapeModule.alignToDirection
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3841711018835687044, guid: b8b2baf1f265f274b856c17ff47f86a3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0.050980393
+      objectReference: {fileID: 0}
+    - target: {fileID: 3841711018835687044, guid: b8b2baf1f265f274b856c17ff47f86a3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.69803923
+      objectReference: {fileID: 0}
+    - target: {fileID: 3841711018835687044, guid: b8b2baf1f265f274b856c17ff47f86a3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 0.81960785
+      objectReference: {fileID: 0}
     - target: {fileID: 5847608202483279443, guid: b8b2baf1f265f274b856c17ff47f86a3, type: 3}
       propertyPath: m_Name
       value: portal_vfx_blue
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762455480716217347, guid: b8b2baf1f265f274b856c17ff47f86a3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.b
+      value: 0.050980393
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762455480716217347, guid: b8b2baf1f265f274b856c17ff47f86a3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.g
+      value: 0.69803923
+      objectReference: {fileID: 0}
+    - target: {fileID: 8762455480716217347, guid: b8b2baf1f265f274b856c17ff47f86a3, type: 3}
+      propertyPath: InitialModule.startColor.maxColor.r
+      value: 0.81960785
       objectReference: {fileID: 0}
     - target: {fileID: 8804365109308810837, guid: b8b2baf1f265f274b856c17ff47f86a3, type: 3}
       propertyPath: m_Pivot.y

@@ -66,7 +66,7 @@ public class MoveAndLook : MonoBehaviour, IDataPersistence
             transform.position = data.spawnPosition;
         }*/
         string sceneName = SceneManager.GetActiveScene().name;
-        if (data.PlayerPosition.ContainsKey(sceneName) && data.PlayerPosition != null)
+        if (data.PlayerPosition.ContainsKey(sceneName))
         {
             Debug.Log("load player position saved in: " + sceneName);
             spawnPosition = data.PlayerPosition[sceneName];
@@ -81,6 +81,10 @@ public class MoveAndLook : MonoBehaviour, IDataPersistence
             else if (sceneName == "Dungeon Slime")
             {
                 spawnPosition = data.spawnPositionDungeonSlime;
+            }
+            else if (sceneName == "DungeonGoblin")
+            {
+                spawnPosition = data.spawnPositionDungeonGoblin;
             }
         }
     }

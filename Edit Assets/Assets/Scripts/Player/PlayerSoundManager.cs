@@ -344,7 +344,7 @@ public class PlayerSoundManager : MonoBehaviour
             {
                 groundTexture = 0;
             }
-            else if (hit.transform.gameObject.CompareTag("Stone"))
+            else if (hit.transform.gameObject.CompareTag("Stone") || hit.transform.gameObject.CompareTag("Dungeon"))
             {
                 groundTexture = 1;
             }

@@ -50,8 +50,8 @@ public class GameData
     {
         counted = 0;
         spawnPositionSampleScene = new Vector3(-273.97f, 14.3f, -242.5f);
-        spawnPositionDungeonSlime = new Vector3(0, 1, 0);
-        spawnPositionDungeonGoblin = new Vector3(0, 1, 0);
+        spawnPositionDungeonSlime = new Vector3(-51.5229988f, 12.7360001f, 130.796997f);
+        spawnPositionDungeonGoblin = new Vector3(2.43799996f, 0.40200001f, -25.5149994f);
         PlayerPosition = new SerializableDictionary<string, Vector3>();
 
         isFemale = true;
