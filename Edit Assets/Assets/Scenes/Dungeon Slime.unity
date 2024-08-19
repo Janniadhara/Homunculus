@@ -3834,6 +3834,18 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1448972371413336940, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: fab5c42b22751ec418729b92e057b0e6, type: 3}
+    - target: {fileID: 5057338488999596837, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1080
+      objectReference: {fileID: 0}
+    - target: {fileID: 5057338488999596837, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7834269839472688968, guid: 3cc4285d7e3963d4eb03f25fd883ec74, type: 3}
       propertyPath: m_Name
       value: DataPersistenceManager
