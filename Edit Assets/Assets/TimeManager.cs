@@ -19,7 +19,7 @@ public class TimeManager : MonoBehaviour
     private TimeSpan sunriseTime;
     [SerializeField] Color dayColor;
     [SerializeField] private float maxSunIntensity;
-    public bool day;
+    public bool sayIsDay;
     private DateTime curTime;
 
     [Header("Moon and Nighttime")]
@@ -28,7 +28,7 @@ public class TimeManager : MonoBehaviour
     private TimeSpan sunsetTime;
     [SerializeField] Color nightColor;
     [SerializeField] private float maxMoonIntensity;
-    public bool night;
+    public bool sayIsNight;
 
     [Header("Pausing Game")]
     [SerializeField] private GameObject PauseScreen;
@@ -54,6 +54,16 @@ public class TimeManager : MonoBehaviour
         sunsetTime = TimeSpan.FromHours(sunSetHour);
 
         PauseScreen.SetActive(false);
+        if (curTime.Hour > sunRiseHour && curTime.Hour < sunSetHour)
+        {
+            sayIsDay = false;
+            sayIsNight = true;
+        }
+        else
+        {
+            sayIsDay = true;
+            sayIsNight = false;
+        }
     }
 
     void Update()
@@ -89,12 +99,16 @@ public class TimeManager : MonoBehaviour
         {
             timeText.text = curTime.ToString("HH:mm");
         }
-        if (curTime.Hour == sunRiseHour)
+        if (curTime.Hour == sunRiseHour && sayIsDay)
         {
+            sayIsDay = false;
+            sayIsNight = true;
             EventsManager.Instance.dayEvent.Sunrise();
         }
-        else if (curTime.Hour == sunSetHour)
+        else if (curTime.Hour == sunSetHour && sayIsNight)
         {
+            sayIsNight = false;
+            sayIsDay = true;
             EventsManager.Instance.dayEvent.Sunset();
         }
     }

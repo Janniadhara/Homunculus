@@ -30,6 +30,7 @@ public class SoundManager : MonoBehaviour, IDataPersistence
     private bool inTavern;
     private bool inFairy;
     private bool inCementary;
+    private bool gamePaused;
 
     public float masterVolume;
     public float musicVolume;
@@ -90,20 +91,8 @@ public class SoundManager : MonoBehaviour, IDataPersistence
     }
     private void Update()
     {
-        if (outside)
+        if (outside && !gamePaused)
         {
-            //switch from night to day music
-            if (isDay && AmbientMusic == NightAmbientMusic)
-            {
-                AmbientMusic = DayAmbientMusic;
-                daynightSwap = true;
-            }
-            //switch from day to night music
-            else if (!isDay && AmbientMusic == DayAmbientMusic)
-            {
-                AmbientMusic = NightAmbientMusic;
-                daynightSwap = true;
-            }
             //make the volume go smoothly to 0 bevore stopping the clip
             if (daynightSwap || inoutSwap)
             {
@@ -128,7 +117,7 @@ public class SoundManager : MonoBehaviour, IDataPersistence
             if (!daynightSwap && !inoutSwap)
             {
                 //if volume is 0 gradually go to desired volume
-                if (MusicSource.volume <= musicVolume)
+                if (MusicSource.volume < musicVolume)
                 {
                     MusicSource.volume += Time.deltaTime * 0.4f;
                 }
@@ -145,7 +134,7 @@ public class SoundManager : MonoBehaviour, IDataPersistence
                 }
             }
         }
-        else if (inTavern)
+        else if (inTavern && !gamePaused)
         {
             //make the volume go smoothly to 0 bevore stopping the clip
             if (MusicSource.isPlaying && inoutSwap)
@@ -161,11 +150,11 @@ public class SoundManager : MonoBehaviour, IDataPersistence
                 inoutSwap = false;
             }
             //if volume is 0 gradually go to desired volume
-            if (MusicSource.volume <= musicVolume / 3 && !inoutSwap)
+            if (MusicSource.volume < musicVolume / 3 && !inoutSwap)
             {
                 MusicSource.volume += Time.deltaTime * 0.4f;
             }
-            if (MusicSource2.volume <= musicVolume && !inoutSwap)
+            if (MusicSource2.volume < musicVolume && !inoutSwap)
             {
                 MusicSource2.volume += Time.deltaTime * 0.4f;
             }
@@ -179,7 +168,7 @@ public class SoundManager : MonoBehaviour, IDataPersistence
                 }
             }
         }
-        else if (inFairy)
+        else if (inFairy && !gamePaused)
         {
             //make the volume go smoothly to 0 bevore stopping the clip
             if (MusicSource.isPlaying && inoutSwap)
@@ -194,12 +183,12 @@ public class SoundManager : MonoBehaviour, IDataPersistence
                 MusicSource2.Play();
                 inoutSwap = false;
             }
-            if (MusicSource2.volume <= musicVolume && !inoutSwap)
+            if (MusicSource2.volume < musicVolume && !inoutSwap)
             {
                 MusicSource2.volume += Time.deltaTime * 0.4f;
             }
         }
-        else if (inCementary)
+        else if (inCementary && !gamePaused)
         {
             //make the volume go smoothly to 0 bevore stopping the clip
             if (MusicSource.isPlaying && inoutSwap)
@@ -212,7 +201,7 @@ public class SoundManager : MonoBehaviour, IDataPersistence
                 inoutSwap = false;
             }
             //if volume is 0 gradually go to desired volume
-            if (MusicSource.volume <= musicVolume && !inoutSwap)
+            if (MusicSource.volume < musicVolume && !inoutSwap)
             {
                 MusicSource.volume += Time.deltaTime * 0.4f;
             }
@@ -336,10 +325,22 @@ public class SoundManager : MonoBehaviour, IDataPersistence
     private void SetDay()
     {
         isDay = true;
+        AmbientMusic = DayAmbientMusic;
+        daynightSwap = true;
+        //switch from night to day music
+        if (isDay && AmbientMusic == NightAmbientMusic)
+        {
+        }
     }
     private void SetNight()
     {
         isDay = false;
+        AmbientMusic = NightAmbientMusic;
+        daynightSwap = true;
+        //switch from day to night music
+        if (!isDay && AmbientMusic == DayAmbientMusic)
+        {
+        }
     }
     private void LevelUp(int level)
     {
@@ -356,12 +357,14 @@ public class SoundManager : MonoBehaviour, IDataPersistence
             MusicSource.Pause();
             MusicSource2.Pause();
             EffectSource.Pause();
+            gamePaused = true;
         }
         else
         {
             MusicSource.UnPause();
             MusicSource2.UnPause();
             EffectSource.UnPause();
+            gamePaused = false;
         }
     }
 }
