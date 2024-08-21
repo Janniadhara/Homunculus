@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 227285018233646581}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071065, z: -0, w: 0.7071071}
-  m_LocalPosition: {x: 0, y: 4.1923075, z: -2}
+  m_LocalPosition: {x: 0, y: 5, z: -2}
   m_LocalScale: {x: 0.5, y: 0.5, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -61,7 +61,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2526315ecf4dd1e41aeec126dcf3359e, type: 2}
+  - {fileID: 2100000, guid: d13c1552b82576b41a332ef762e937c1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -280,7 +280,7 @@ Transform:
   m_GameObject: {fileID: 3701920893131182784}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071065, z: -0, w: 0.7071071}
-  m_LocalPosition: {x: 0, y: 4.1923075, z: -2}
+  m_LocalPosition: {x: 0, y: 5, z: -2}
   m_LocalScale: {x: 0.5, y: 0.5, z: 4}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -314,7 +314,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2526315ecf4dd1e41aeec126dcf3359e, type: 2}
+  - {fileID: 2100000, guid: d13c1552b82576b41a332ef762e937c1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -783,7 +783,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2526315ecf4dd1e41aeec126dcf3359e, type: 2}
+  - {fileID: 2100000, guid: 39f13ecdedaf7f244a18d0351e6da58e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -889,14 +889,14 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: -0.00000035762784}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.3, z: 1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 3080132008680932877}
   - {fileID: 7268956547821311063}
   - {fileID: 1286071487667108671}
   - {fileID: 7418559142733844290}
   - {fileID: 5038397500796754076}
+  - {fileID: 3080132008680932877}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
 --- !u!33 &9014173460716556219
@@ -993,4 +993,6 @@ MonoBehaviour:
   FrontDoor: {fileID: 7368423078657624670}
   BackDoor: {fileID: 0}
   UnvisitedBlock: {fileID: 8057373888652104152}
+  Index: {x: 0, y: 0}
   distanceToSpawn: 0
+  type: 0

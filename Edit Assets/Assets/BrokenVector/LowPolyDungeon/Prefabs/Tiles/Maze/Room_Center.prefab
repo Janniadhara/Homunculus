@@ -84,7 +84,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.3, z: 1.5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1988585822111387890}
@@ -179,8 +179,14 @@ MonoBehaviour:
   RightWall: {fileID: 0}
   FrontWall: {fileID: 0}
   BackWall: {fileID: 0}
+  LeftDoor: {fileID: 0}
+  RightDoor: {fileID: 0}
+  FrontDoor: {fileID: 0}
+  BackDoor: {fileID: 0}
   UnvisitedBlock: {fileID: 4382508283239817015}
+  Index: {x: 0, y: 0}
   distanceToSpawn: 0
+  type: 0
 --- !u!1 &6847117139135125392
 GameObject:
   m_ObjectHideFlags: 0
@@ -242,7 +248,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2526315ecf4dd1e41aeec126dcf3359e, type: 2}
+  - {fileID: 2100000, guid: 39f13ecdedaf7f244a18d0351e6da58e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

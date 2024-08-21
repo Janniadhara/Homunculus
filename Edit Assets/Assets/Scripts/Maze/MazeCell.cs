@@ -4,6 +4,14 @@ using UnityEngine;
 
 public class MazeCell : MonoBehaviour
 {
+    public enum CellType
+    {
+        None,
+        Room,
+        Hallway,
+        Stairs,
+        EmptySpace
+    }
     [SerializeField] private GameObject LeftWall;
     [SerializeField] private GameObject RightWall;
     [SerializeField] private GameObject FrontWall;
@@ -16,12 +24,17 @@ public class MazeCell : MonoBehaviour
     private bool isEntrance;
 
     public bool isVisited { get; private set; }
+    public Vector2Int Index;
     public int distanceToSpawn;
+    public CellType type;
 
     public void Visit()
     {
         isVisited = true;
-        UnvisitedBlock.SetActive(false);
+        if (UnvisitedBlock != null)
+        {
+            UnvisitedBlock.SetActive(false);
+        }
     }
     public void ClearLeftWall()
     {
