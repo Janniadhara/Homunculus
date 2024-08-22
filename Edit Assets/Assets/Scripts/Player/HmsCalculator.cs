@@ -179,7 +179,7 @@ public class HmsCalculator : MonoBehaviour, IDataPersistence
         }
         if (curHealth <= 0)
         {
-            curHealth = 0;
+            curHealth = 1;
             //isAlive = false;
         }
         HealthSlider.value = curHealth / maxHealth;

@@ -59,7 +59,8 @@ MonoBehaviour:
   FrontDoor: {fileID: 0}
   BackDoor: {fileID: 0}
   UnvisitedBlock: {fileID: 0}
-  Index: {x: 0, y: 0}
+  EntranceBlock: {fileID: 0}
+  Index: {x: 0, y: 0, z: 0}
   distanceToSpawn: 0
   type: 0
 --- !u!1 &894435020455840117
@@ -434,7 +435,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 57bc8cbdefdab5943a0c1f45819884ab, type: 2}
+  - {fileID: 2100000, guid: 2f40ebfef9c719a4c93aabb72df13acd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -549,7 +550,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 57bc8cbdefdab5943a0c1f45819884ab, type: 2}
+  - {fileID: 2100000, guid: 2f40ebfef9c719a4c93aabb72df13acd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -910,7 +911,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 57bc8cbdefdab5943a0c1f45819884ab, type: 2}
+  - {fileID: 2100000, guid: 2f40ebfef9c719a4c93aabb72df13acd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

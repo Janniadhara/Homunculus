@@ -10,7 +10,8 @@ public class MazeCell : MonoBehaviour
         Room,
         Hallway,
         Stairs,
-        EmptySpace
+        EmptySpace,
+        Entrance
     }
     [SerializeField] private GameObject LeftWall;
     [SerializeField] private GameObject RightWall;
@@ -21,10 +22,11 @@ public class MazeCell : MonoBehaviour
     [SerializeField] private GameObject FrontDoor;
     [SerializeField] private GameObject BackDoor;
     [SerializeField] private GameObject UnvisitedBlock;
+    [SerializeField] private GameObject EntranceBlock;
     private bool isEntrance;
 
     public bool isVisited { get; private set; }
-    public Vector2Int Index;
+    public Vector3Int Index;
     public int distanceToSpawn;
     public CellType type;
 
@@ -34,6 +36,10 @@ public class MazeCell : MonoBehaviour
         if (UnvisitedBlock != null)
         {
             UnvisitedBlock.SetActive(false);
+        }
+        if (EntranceBlock != null)
+        {
+            EntranceBlock.SetActive(false);
         }
     }
     public void ClearLeftWall()
@@ -84,6 +90,17 @@ public class MazeCell : MonoBehaviour
     {
         isVisited = false;
         isEntrance = true;
-        UnvisitedBlock.SetActive(true);
+        type = CellType.Entrance;
+        EntranceBlock.SetActive(true);
+    }
+    public void SetIndex(int x , int y, int z)
+    {
+        Index.x = x; 
+        Index.y = y;
+        Index.z = z;
+    }
+    public void SetType(MazeCell.CellType type)
+    {
+        this.type = type;
     }
 }
