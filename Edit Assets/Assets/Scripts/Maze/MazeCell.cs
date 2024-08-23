@@ -37,10 +37,6 @@ public class MazeCell : MonoBehaviour
         {
             UnvisitedBlock.SetActive(false);
         }
-        if (EntranceBlock != null)
-        {
-            EntranceBlock.SetActive(false);
-        }
     }
     public void ClearLeftWall()
     {
@@ -91,7 +87,10 @@ public class MazeCell : MonoBehaviour
         isVisited = false;
         isEntrance = true;
         type = CellType.Entrance;
-        EntranceBlock.SetActive(true);
+        if (EntranceBlock != null)
+        {
+            EntranceBlock.SetActive(true);
+        }
     }
     public void SetIndex(int x , int y, int z)
     {

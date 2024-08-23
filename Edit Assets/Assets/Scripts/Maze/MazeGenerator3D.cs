@@ -119,9 +119,9 @@ public class MazeGenerator3D : MonoBehaviour
         GameObject Room = Instantiate(RoomGeneratorPrefab,
             transform.position + roomLocation /*+ new Vector3(offsetX, roomLocation.y - 3, offsetZ)*/,
             Quaternion.identity, transform);
-        Room.GetComponent<RoomGenerator>().roomWidth = size.x;
-        Room.GetComponent<RoomGenerator>().roomDepth = size.z;
-        Room.GetComponent<RoomGenerator>().GenerateRoom();
+        //Room.GetComponent<RoomGenerator>().roomWidth = size.x;
+        //Room.GetComponent<RoomGenerator>().roomDepth = size.z;
+        //Room.GetComponent<RoomGenerator>().GenerateRoom();
     }
     void PlaceCorridorOnEachFloor()
     {
