@@ -291,10 +291,10 @@ MonoBehaviour:
   FarthestCell: {fileID: 0}
   BossRoomPrefab: {fileID: -8555953962199074092, guid: 31f539cdb211e4546b347c55bd2aec81, type: 3}
   TreasureRoomPrefab: {fileID: 2326097870500938031, guid: cad058379476bb847b909b6f7d298d8d, type: 3}
-  mazeSize: {x: 20, y: 1, z: 20}
+  mazeSize: {x: 20, y: 10, z: 20}
   cellSize: 4
   generateWithRooms: 1
-  roomAttempts: 60
+  roomAttempts: 50
   MazeRoomPrefab: {fileID: 2098914138628387441, guid: 0072a06c01c39084fa1ebdee63a2a9f7, type: 3}
   CornerPrefabLU: {fileID: 769181598030719053, guid: 4e279b1f80baafd42bac2f1a9fcc54e1, type: 3}
   CornerPrefabLO: {fileID: 769181598030719053, guid: f150c3b0629f023458a9b7580587bee9, type: 3}
@@ -303,24 +303,24 @@ MonoBehaviour:
   WallPrefab: {fileID: -5694751379214198763, guid: 32664fd6c2c5d40478c0edab9209531d, type: 3}
   MiddlePrefab: {fileID: -8968160369904204977, guid: b3c66b8c985666f48ba171dcd9212172, type: 3}
   roomMinSize: {x: 2, y: 2}
-  roomMaxSize: {x: 8, y: 8}
+  roomMaxSize: {x: 4, y: 4}
   Rooms: []
-  generateWithEmpty: 0
-  emptyAttempts: 400
+  generateWithEmpty: 1
+  emptyAttempts: 1800
   EmptySpacePrefab: {fileID: 4631317267347340134, guid: 6f8f9eef7373abf45a95916cf79b8ed0, type: 3}
   emptyMinSize: {x: 1, y: 1}
   emptyMaxSize: {x: 3, y: 3}
   generateWithStairs: 1
-  stairsAttempts: 30
+  stairsAttempts: 50
   MazeStaircasePrefab: {fileID: -3152905326107139139, guid: a405f744a6c71e34fb54b7a5cfe0212b, type: 3}
   StairsEntrancePrefab: {fileID: 1143858557440416183, guid: 94c2099a59c460743809f8caa876faad, type: 3}
   StairsPrefab: {fileID: -1828797568506290323, guid: 9c106e45cc9beba4d9c706f327030f5d, type: 3}
   StairsPlaceholder: {fileID: 4631317267347340134, guid: c1597643d3e72b94c85375a3bb649d2c, type: 3}
-  maxStairsAmount: 5
+  maxStairsAmount: 3
   Staircases: []
   isValid: 0
   Entrances: []
-  testVector: {x: 0, y: 0, z: 0}
+  Camera: {fileID: 557943686}
 --- !u!4 &265118405
 Transform:
   m_ObjectHideFlags: 0

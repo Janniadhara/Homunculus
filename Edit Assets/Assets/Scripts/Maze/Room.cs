@@ -15,4 +15,9 @@ public class Room : MonoBehaviour
         entranceCells.Add(entrance);
         return entrance;
     }
+    public MazeCell GetRandomEntrance()
+    {
+        int randEntrance = Random.Range(0, entranceCells.Count);
+        return entranceCells[randEntrance];
+    }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Unity.VisualScripting;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class MazeGenerator : MonoBehaviour
 {
@@ -48,18 +49,21 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField] private List<Staircase> Staircases = new List<Staircase>();
 
     public bool isValid;
+    [Header("Entrance Stuff")]
     [SerializeField] private List<MazeCell> Entrances;
-    public Vector3Int testVector = new Vector3Int();
-    
+    List<MazeCell> entrancesOnOneLevel;
+    private int lastdirection;
+
+    [Header("Camera")]
+    [SerializeField] private GameObject Camera;
+
 
     IEnumerator Start()
     {
         isValid = true;
         cellSize *= transform.localScale.x;
-        mazeGrid = new MazeCell[
-            mazeSize.x, 
-            mazeSize.y * 2, 
-            mazeSize.z];
+        mazeGrid = new MazeCell[mazeSize.x, mazeSize.y * 2, mazeSize.z];
+        entrancesOnOneLevel = new List<MazeCell>();
         if (generateWithStairs)
         {
             CreateStaircase();
@@ -71,12 +75,7 @@ public class MazeGenerator : MonoBehaviour
             Debug.Log("Rooms generated");
             //yield return GenerateRooms();
         }
-        if (generateWithEmpty)
-        {
-            GenerateEmpty();
-            Debug.Log("Empty Spaces generated");
-            //yield return GenerateEmpty();
-        }
+
         mazeGrid[0, 0, 0] = Instantiate(
             MazeCellPrefab[Random.Range(0, MazeCellPrefab.Length)],
             new Vector3( 0, 0, 0) + transform.position,
@@ -86,32 +85,25 @@ public class MazeGenerator : MonoBehaviour
         mazeGrid[0, 0, 0].SetEntrance();
         mazeGrid[0, 0, 0].SetType(MazeCell.CellType.Entrance);
         Entrances.Add(mazeGrid[0, 0, 0]);
-        BeginToConnectEntrances();
+
+        yield return ConnectEntrances();
+        if (generateWithEmpty)
+        {
+            GenerateEmpty();
+            Debug.Log("Empty Spaces generated");
+            //yield return GenerateEmpty();
+        }
+        FillRestWithHallways();
+
         for (int y = 0; y < mazeSize.y; y++)
         {
-            for (int x = 0; x < mazeSize.x; x++)
+            for (int x = 0; x < Entrances.Count; x++)
             {
-                for (int z = 0; z < mazeSize.z; z++)
+                if (Entrances[x].Index.y == y)
                 {
-                    if (mazeGrid[x, y, z] == null)
-                    {
-                        mazeGrid[x, y , z] = Instantiate(
-                            MazeCellPrefab[Random.Range(0, MazeCellPrefab.Length)],
-                            new Vector3(
-                                x * cellSize, 
-                                y * cellSize * 2, 
-                                z * cellSize) + transform.position,
-                            Quaternion.identity, transform
-                            );
-                        mazeGrid[x, y, z].SetIndex(x, y, z);
-                        mazeGrid[x, y, z].SetType(MazeCell.CellType.Hallway);
-                    }
+                    yield return GenerateMaze(null, mazeGrid[Entrances[x].Index.x, Entrances[x].Index.y, Entrances[x].Index.z]);
                 }
             }
-        }
-        for (int y = 0; y < mazeSize.y; y++)
-        {
-            yield return GenerateMaze(null, mazeGrid[0, y, 0]);
         }
 
         Debug.Log("Maze generated");
@@ -121,6 +113,32 @@ public class MazeGenerator : MonoBehaviour
         if (!isValid)
         {
             Debug.LogWarning("Maze not valid");
+        }
+    }
+    private void FillRestWithHallways()
+    {
+        for (int y = 0; y < mazeSize.y; y++)
+        {
+            for (int x = 0; x < mazeSize.x; x++)
+            {
+                for (int z = 0; z < mazeSize.z; z++)
+                {
+                    if (mazeGrid[x, y, z] == null)
+                    {
+                        mazeGrid[x, y, z] = Instantiate(
+                            /*MazeCellPrefab[Random.Range(0, MazeCellPrefab.Length)]*/ EmptySpacePrefab,
+                            new Vector3(
+                                x * cellSize,
+                                y * cellSize * 2,
+                                z * cellSize) + transform.position,
+                            Quaternion.identity, transform
+                            );
+                        mazeGrid[x, y, z].SetIndex(x, y, z);
+                        /*mazeGrid[x, y, z].SetType(MazeCell.CellType.Hallway) */ mazeGrid[x, y, z].SetType(MazeCell.CellType.EmptySpace);
+                        mazeGrid[x, y, z].Visit(); //when filled with empty
+                    }
+                }
+            }
         }
     }
     private void GenerateRooms()
@@ -135,9 +153,9 @@ public class MazeGenerator : MonoBehaviour
                     1,
                     Random.Range(roomMinSize.y, roomMaxSize.y) + 1);
                 Vector3Int roomLocation = new Vector3Int(
-                    Random.Range(0, mazeSize.x - roomSize.x),
+                    Random.Range(1, mazeSize.x - roomSize.x),
                     mazeHight,
-                    Random.Range(0, mazeSize.z - roomSize.z));
+                    Random.Range(1, mazeSize.z - roomSize.z));
                 if (roomLocation.x < 2 && roomLocation.z < 2)
                 {
                     roomLocation.x += 2;
@@ -253,8 +271,9 @@ public class MazeGenerator : MonoBehaviour
             {
                 entrance = Rooms[i].GetRandomBorderCell(entrance);
                 mazeGrid[entrance.Index.x, entrance.Index.y, entrance.Index.z].SetEntrance();
-                Entrances.Add(mazeGrid[entrance.Index.x, entrance.Index.y, entrance.Index.z]);
+                //Entrances.Add(mazeGrid[entrance.Index.x, entrance.Index.y, entrance.Index.z]);
             }
+            Entrances.Add(Rooms[i].GetRandomEntrance());
         }
     }
     private void GenerateEmpty()
@@ -268,7 +287,7 @@ public class MazeGenerator : MonoBehaviour
                     1,
                     Random.Range(emptyMinSize.y, emptyMaxSize.y + 1));
                 Vector3Int emptyLocation = new Vector3Int(
-                    Random.Range(1, mazeSize.x - emptySize.x),
+                    Random.Range(0, mazeSize.x - emptySize.x),
                     mazeHight,
                     Random.Range(0, mazeSize.z - emptySize.z));
                 if (emptyLocation.x < 2 && emptyLocation.z < 2)
@@ -319,7 +338,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     stairsSize = new Vector3Int(5, 2, 1);
                 }
-                if (!CheckOverlapping(stairsLocation, stairsSize, MazeCell.CellType.None))
+                if (!CheckOverlapping(stairsLocation + new Vector3Int(-1, 0, -1), stairsSize + new Vector3Int(2, 0, 2), MazeCell.CellType.None))
                 {
                     Staircase staircase = Instantiate(MazeStaircasePrefab,
                         new Vector3(
@@ -354,7 +373,7 @@ public class MazeGenerator : MonoBehaviour
                         mazeGrid[location.x + x, location.y + y, location.z + z] = Instantiate(StairsPlaceholder,
                             new Vector3((location.x + x) * cellSize, (location.y + y) * cellSize * 2, (location.z + z) * cellSize) + transform.position,
                             Quaternion.identity, transform);
-                        mazeGrid[location.x + x, location.y + y, location.z + z].SetIndex(location.x + x, y, location.y + z);
+                        mazeGrid[location.x + x, location.y + y, location.z + z].SetIndex(location.x + x, y, location.z + z);
                         mazeGrid[location.x + x, location.y + y, location.z + z].SetType(MazeCell.CellType.Stairs);
                         mazeGrid[location.x + x, location.y + y, location.z + z].Visit();
                         //why is that here?
@@ -444,66 +463,7 @@ public class MazeGenerator : MonoBehaviour
         mazeGrid[location.x, location.y, location.z] = mazeCell;
         mazeCell.SetEntrance();
         mazeCell.SetIndex(location.x, location.y, location.z);
-    }
-    private MazeCell GetNextCell(MazeCell fromCell, MazeCell toCell)
-    {
-        if (fromCell.Index.x <= toCell.Index.x)
-        {
-            if (mazeGrid[fromCell.Index.x + 1, fromCell.Index.y, fromCell.Index.z].type == MazeCell.CellType.Room)
-            {
-                if (mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1].type == MazeCell.CellType.Room)
-                {
-                    return mazeGrid[fromCell.Index.x - 1, fromCell.Index.y, fromCell.Index.z];
-                }
-                else
-                {
-                    return mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1];
-                }
-            }
-            else
-            {
-                return mazeGrid[fromCell.Index.x + 1, fromCell.Index.y, fromCell.Index.z];
-            }
-        }
-        if (fromCell.Index.z <= toCell.Index.z)
-        {
-            if (mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1].type == MazeCell.CellType.Room)
-            {
-                if (mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1].type == MazeCell.CellType.Room)
-                {
-                    return mazeGrid[fromCell.Index.x - 1, fromCell.Index.y, fromCell.Index.z];
-                }
-                else
-                {
-                    return mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1];
-                }
-            }
-            else
-            {
-                return mazeGrid[fromCell.Index.x + 1, fromCell.Index.y, fromCell.Index.z];
-            }
-            //z += 1;
-            if (mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1].type == MazeCell.CellType.Room)
-            {
-                return mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1];
-            }
-            else
-            {
-                return mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1];
-            }
-        }
-        if (fromCell.Index.x > toCell.Index.x)
-        {
-            if (mazeGrid[fromCell.Index.x - 1, fromCell.Index.y, fromCell.Index.z].type == MazeCell.CellType.Room)
-            {
-                return mazeGrid[fromCell.Index.x, fromCell.Index.y, fromCell.Index.z + 1];
-            }
-            else
-            {
-                return mazeGrid[fromCell.Index.x - 1, fromCell.Index.y, fromCell.Index.z];
-            }
-        }
-        return null;
+        mazeCell.SetType(MazeCell.CellType.Stairs);
     }
     private bool CheckOverlapping(Vector3Int location, Vector3Int size, MazeCell.CellType ignoreType)
     {
@@ -610,9 +570,8 @@ public class MazeGenerator : MonoBehaviour
             }
         }
     }
-    private void BeginToConnectEntrances()
+    private IEnumerator ConnectEntrances()
     {
-        List<MazeCell> entrancesOnOneLevel = new List<MazeCell>();
         for (int height = 0; height < mazeSize.y; height++)
         {
             for (int x = 0; x < Entrances.Count; x++)
@@ -620,55 +579,198 @@ public class MazeGenerator : MonoBehaviour
                 if (Entrances[x].Index.y == height)
                 {
                     entrancesOnOneLevel.Add(Entrances[x]);
+                    Debug.Log(Entrances[x].Index);
                 }
             }
             //here connect them (pathfinding -.-)
-            MazeCell currEntrance = null;
-            MazeCell nextEntrance = null;
-            for (int i = 0; i < entrancesOnOneLevel.Count - 1; i++)
+            if (entrancesOnOneLevel.Count > 2)
             {
-                currEntrance = GetNextEntrance(entrancesOnOneLevel, currEntrance, i, height);
-                nextEntrance = GetNextEntrance(entrancesOnOneLevel, currEntrance, i + 1, height);
-                if (nextEntrance != null && currEntrance != null)
+                for (int i = 0; i < entrancesOnOneLevel.Count - 1; i++)
                 {
-                    Vector3Int direction = nextEntrance.Index - currEntrance.Index;
-                    do
-                    {
-                        int randX = Random.Range(0, 2);
-                        int randY = Random.Range(0, 2);
-                        if (randX == 1 && mazeGrid[currEntrance.Index.x + randX, currEntrance.Index.y, currEntrance.Index.z] != null)
-                        {
-                            mazeGrid[currEntrance.Index.x + randX, currEntrance.Index.y, currEntrance.Index.z] = Instantiate(
-                            MazeCellPrefab[Random.Range(0, MazeCellPrefab.Length)],
-                            new Vector3(
-                                currEntrance.Index.x * cellSize + randX,
-                                currEntrance.Index.y * cellSize * 2,
-                                currEntrance.Index.z * cellSize) + transform.position,
-                            Quaternion.identity, transform
-                            );
-                            mazeGrid[currEntrance.Index.x + randX, currEntrance.Index.y, currEntrance.Index.z].SetIndex(currEntrance.Index.x + randX, currEntrance.Index.y, currEntrance.Index.z);
-                            mazeGrid[currEntrance.Index.x + randX, currEntrance.Index.y, currEntrance.Index.z].SetType(MazeCell.CellType.Hallway);
-                        }
-                    } while (currEntrance != nextEntrance);
-                    currEntrance = nextEntrance;
+                    yield return CreatePathBetweenTwoEntrances(entrancesOnOneLevel[i].Index, entrancesOnOneLevel[i + 1].Index);
                 }
+                entrancesOnOneLevel.Clear();
+                lastdirection = 4;
+                Debug.Log("entrancesOnOneLevel got cleared");
             }
         }
     }
-    private MazeCell GetNextEntrance(List<MazeCell> entrancesOnOneLevel, MazeCell currEntrance, int count, int height)
+    private IEnumerator CreatePathBetweenTwoEntrances(Vector3Int currCellIndex, Vector3Int nextEntranceIndex)
     {
-        if (currEntrance == null)
+        currCellIndex = GetNextClosestCell(currCellIndex, nextEntranceIndex);
+        Debug.Log(currCellIndex + " " + nextEntranceIndex);
+
+        if (mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z] == null)
         {
-            return entrancesOnOneLevel[count];
+            mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z] = Instantiate(
+                            MazeCellPrefab[Random.Range(0, MazeCellPrefab.Length)],
+                            new Vector3(
+                                currCellIndex.x * cellSize,
+                                currCellIndex.y * cellSize * 2,
+                                currCellIndex.z * cellSize) + transform.position,
+                            Quaternion.identity, transform
+                            );
+            mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z].SetIndex(currCellIndex.x, currCellIndex.y, currCellIndex.z);
+            mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z].SetType(MazeCell.CellType.Hallway);
         }
-        if (entrancesOnOneLevel[count].Index.y != height)
+        //only one level for now
+        
+        yield return new WaitForSeconds(0.1f);
+
+        //nextEntrance = Rooms[1].GetRandomEntrance();
+        if (currCellIndex != nextEntranceIndex)
         {
-            return null;
+            yield return CreatePathBetweenTwoEntrances(currCellIndex, nextEntranceIndex);
         }
-        else
+        //get random entrance from room 1, then from room 2
+        //after that connect them
+        //get adjacent cells from currCell that can be moved to (only null)
+        //return the one with the least distance to nextEntrance
+        //spawn a hallway at the index of the returned cell
+
+        //then random from room 2 to random from room 3, etc
+    }
+    private Vector3Int GetNextClosestCell(Vector3Int currCellIndex, Vector3Int nextEntranceIndex)
+    {
+        List <Vector3Int> freeCellIndex = new List<Vector3Int>();
+        Vector3Int nextCellIndex = new Vector3Int(0, 0, 0);
+        if (lastdirection != 0) //only check front if not moved back
         {
-            return entrancesOnOneLevel[count];
+            if (currCellIndex.z + 1 < mazeSize.z && mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z + 1] == null)
+            {
+                freeCellIndex.Add(new Vector3Int(currCellIndex.x, currCellIndex.y, currCellIndex.z + 1));
+                Debug.Log("check front");
+            }
+            else if (currCellIndex.z + 1 < mazeSize.z && mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z + 1].type == MazeCell.CellType.Hallway)
+            {
+                freeCellIndex.Add(new Vector3Int(currCellIndex.x, currCellIndex.y, currCellIndex.z + 1));
+                Debug.Log("check front hallway");
+            }
+            if (currCellIndex + new Vector3Int(0, 0, 1) == nextEntranceIndex)
+            {
+                nextCellIndex = nextEntranceIndex;
+                lastdirection = 4;
+                Debug.Log("found entrance front");
+                return nextCellIndex;
+            }
         }
+        if (lastdirection != 1) //only check right if not moved left
+        {
+            if (currCellIndex.x + 1 < mazeSize.x && mazeGrid[currCellIndex.x + 1, currCellIndex.y, currCellIndex.z] == null)
+            {
+                freeCellIndex.Add(new Vector3Int(currCellIndex.x + 1, currCellIndex.y, currCellIndex.z));
+                Debug.Log("check right");
+            }
+            else if (currCellIndex.x + 1 < mazeSize.x && mazeGrid[currCellIndex.x + 1, currCellIndex.y, currCellIndex.z].type == MazeCell.CellType.Hallway)
+            {
+                freeCellIndex.Add(new Vector3Int(currCellIndex.x + 1, currCellIndex.y, currCellIndex.z));
+                Debug.Log("check right hallway");
+            }
+            if (currCellIndex + new Vector3Int(1, 0, 0) == nextEntranceIndex)
+            {
+                nextCellIndex = nextEntranceIndex;
+                lastdirection = 4;
+                Debug.Log("found entrance right");
+                return nextCellIndex;
+            }
+        }
+        if (lastdirection != 2) //only check back if not moved front
+        {
+            if (currCellIndex.z - 1 >= 0 && mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z - 1] == null)
+            {
+                freeCellIndex.Add(new Vector3Int(currCellIndex.x, currCellIndex.y, currCellIndex.z - 1));
+                Debug.Log("check back");
+            }
+            else if (currCellIndex.z - 1 >= 0 && mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z - 1].type == MazeCell.CellType.Hallway)
+            {
+                freeCellIndex.Add(new Vector3Int(currCellIndex.x, currCellIndex.y, currCellIndex.z - 1));
+                Debug.Log("check back hallway");
+            }
+            if (currCellIndex + new Vector3Int(0, 0, -1) == nextEntranceIndex)
+            {
+                nextCellIndex = nextEntranceIndex;
+                lastdirection = 4;
+                Debug.Log("found entrance back");
+                return nextCellIndex;
+            }
+        }
+        if (lastdirection != 3) //only check left if not moved right
+        {
+            if (currCellIndex.x - 1 >= 0 && mazeGrid[currCellIndex.x - 1, currCellIndex.y, currCellIndex.z] == null)
+            {
+                freeCellIndex.Add(new Vector3Int(currCellIndex.x - 1, currCellIndex.y, currCellIndex.z));
+                Debug.Log("check left");
+            }
+            else if (currCellIndex.x - 1 >= 0 && mazeGrid[currCellIndex.x - 1, currCellIndex.y, currCellIndex.z].type == MazeCell.CellType.Hallway)
+            {
+                freeCellIndex.Add(new Vector3Int(currCellIndex.x - 1, currCellIndex.y, currCellIndex.z));
+                Debug.Log("check left hallway");
+            }
+            if (currCellIndex + new Vector3Int(-1, 0, 0) == nextEntranceIndex)
+            {
+                nextCellIndex = nextEntranceIndex;
+                lastdirection = 4;
+                Debug.Log("found entrance left");
+                return nextCellIndex;
+            }
+        }
+        //get the cell with smallest distance
+        if (freeCellIndex.Count > 0)
+        {
+            if (freeCellIndex[0].z < currCellIndex.z)
+            {
+                //move back
+                lastdirection = 0;
+            }
+            if (freeCellIndex[0].x < currCellIndex.x)
+            {
+                //move left
+                lastdirection = 1;
+            }
+            if (freeCellIndex[0].z > currCellIndex.z)
+            {
+                //move front
+                lastdirection = 2;
+            }
+            if (freeCellIndex[0].x > currCellIndex.x)
+            {
+                //move right
+                lastdirection = 3;
+            }
+            Debug.Log(freeCellIndex.Count());
+            float distance = Vector3.Distance(freeCellIndex[0], nextEntranceIndex);
+            nextCellIndex = new Vector3Int(freeCellIndex[0].x, freeCellIndex[0].y, freeCellIndex[0].z);
+            for (int i = 0; i < freeCellIndex.Count; i++)
+            {
+                if (Vector3.Distance(freeCellIndex[i], nextEntranceIndex) < distance)
+                {
+                    if (freeCellIndex[i].z < currCellIndex.z)
+                    {
+                        //move back
+                        lastdirection = 0;
+                    }
+                    if (freeCellIndex[i].x < currCellIndex.x)
+                    {
+                        //move left
+                        lastdirection = 1;
+                    }
+                    if (freeCellIndex[i].z > currCellIndex.z)
+                    {
+                        //move front
+                        lastdirection = 2;
+                    }
+                    if (freeCellIndex[i].x > currCellIndex.x)
+                    {
+                        //move right
+                        lastdirection = 3;
+                    }
+                    distance = Vector3.Distance(freeCellIndex[i], nextEntranceIndex);
+                    nextCellIndex = new Vector3Int(freeCellIndex[i].x, freeCellIndex[i].y, freeCellIndex[i].z);
+                }
+            }
+        }
+        Debug.Log("direction: " + lastdirection);
+        return nextCellIndex;
     }
     private IEnumerator GenerateMaze(MazeCell prevCell, MazeCell currCell)
     {
@@ -873,60 +975,9 @@ public class MazeGenerator : MonoBehaviour
             return;
         }
     }
-    /*
-    private MazeCell GetNextVisitedCell(MazeCell currCell)
-    {
-        var visitedCells = GetVisitedCells(currCell);
-        return visitedCells.OrderBy(_ => Random.Range(1, 10)).FirstOrDefault();
-    }
-    private IEnumerable<MazeCell> GetVisitedCells(MazeCell currCell)
-    {
-        int x = currCell.Index.x;
-        int z = currCell.Index.y;
-        if (x + distancetoNextCell < mazeSize.x)
-        {
-            var cellToRight = mazeGrid[x + distancetoNextCell, z];
-            if (cellToRight.isVisited == true && (cellToRight.type == MazeCell.CellType.Hallway || cellToRight.type == MazeCell.CellType.Entrance))
-            {
-                yield return cellToRight;
-            }
-        }
-        if (x - distancetoNextCell >= 0)
-        {
-            var cellToLeft = mazeGrid[x - distancetoNextCell, z];
-            if (cellToLeft.isVisited == true && (cellToLeft.type == MazeCell.CellType.Hallway || cellToLeft.type == MazeCell.CellType.Entrance))
-            {
-                yield return cellToLeft;
-            }
-        }
-        if (z + distancetoNextCell < mazeSize.z)
-        {
-            var cellToFront = mazeGrid[x, z + distancetoNextCell];
-            if (cellToFront.isVisited == true && (cellToFront.type == MazeCell.CellType.Hallway || cellToFront.type == MazeCell.CellType.Entrance))
-            {
-                yield return cellToFront;
-            }
-        }
-        if (z - distancetoNextCell >= 0)
-        {
-            var cellToBack = mazeGrid[x, z - distancetoNextCell];
-            if (cellToBack.isVisited == true && (cellToBack.type == MazeCell.CellType.Hallway || cellToBack.type == MazeCell.CellType.Entrance))
-            {
-                yield return cellToBack;
-            }
-        }
-    }
-    */
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
-        Vector3 size = new Vector3(mazeSize.x, mazeSize.y * 2, mazeSize.z);
-        Gizmos.DrawWireCube(transform.position + size * 3, size * 6);
-        Gizmos.color = Color.blue;
-        for (int i = 0; i < Rooms.Count - 1; i++)
-        {
-            testVector = Entrances[1].Index - Entrances[0].Index;
-            //Gizmos.DrawLine(Rooms[i].transform.position, Rooms[i + 1].transform.position);
-        }
+        Gizmos.DrawWireCube(new Vector3((transform.position.x + mazeSize.x) * cellSize / 2, (transform.position.y + mazeSize.y) * cellSize, (transform.position.z + mazeSize.z) * cellSize / 2), new Vector3((transform.position.x + mazeSize.x) * cellSize, (transform.position.y + mazeSize.y) * cellSize * 2, (transform.position.z + mazeSize.z) * cellSize));
     }
 }
