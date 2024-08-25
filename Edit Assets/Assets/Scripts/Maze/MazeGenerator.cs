@@ -86,7 +86,8 @@ public class MazeGenerator : MonoBehaviour
         mazeGrid[0, 0, 0].SetType(MazeCell.CellType.Entrance);
         Entrances.Add(mazeGrid[0, 0, 0]);
 
-        yield return ConnectEntrances();
+        ConnectEntrances();
+        //yield return ConnectEntrances();
         if (generateWithEmpty)
         {
             GenerateEmpty();
@@ -461,7 +462,7 @@ public class MazeGenerator : MonoBehaviour
             new Vector3((location.x) * cellSize, location.y * cellSize * 2, (location.z) * cellSize) + transform.position,
             Quaternion.Euler(0, 90 * variant, 0), transform);
         mazeGrid[location.x, location.y, location.z] = mazeCell;
-        mazeCell.SetEntrance();
+        mazeCell.Visit();
         mazeCell.SetIndex(location.x, location.y, location.z);
         mazeCell.SetType(MazeCell.CellType.Stairs);
     }
@@ -570,7 +571,7 @@ public class MazeGenerator : MonoBehaviour
             }
         }
     }
-    private IEnumerator ConnectEntrances()
+    private void ConnectEntrances()
     {
         for (int height = 0; height < mazeSize.y; height++)
         {
@@ -587,7 +588,7 @@ public class MazeGenerator : MonoBehaviour
             {
                 for (int i = 0; i < entrancesOnOneLevel.Count - 1; i++)
                 {
-                    yield return CreatePathBetweenTwoEntrances(entrancesOnOneLevel[i].Index, entrancesOnOneLevel[i + 1].Index);
+                   CreatePathBetweenTwoEntrances(entrancesOnOneLevel[i].Index, entrancesOnOneLevel[i + 1].Index);
                 }
                 entrancesOnOneLevel.Clear();
                 lastdirection = 4;
@@ -595,7 +596,7 @@ public class MazeGenerator : MonoBehaviour
             }
         }
     }
-    private IEnumerator CreatePathBetweenTwoEntrances(Vector3Int currCellIndex, Vector3Int nextEntranceIndex)
+    private void CreatePathBetweenTwoEntrances(Vector3Int currCellIndex, Vector3Int nextEntranceIndex)
     {
         currCellIndex = GetNextClosestCell(currCellIndex, nextEntranceIndex);
         Debug.Log(currCellIndex + " " + nextEntranceIndex);
@@ -615,12 +616,12 @@ public class MazeGenerator : MonoBehaviour
         }
         //only one level for now
         
-        yield return new WaitForSeconds(0.1f);
+        //yield return new WaitForSeconds(0.1f);
 
         //nextEntrance = Rooms[1].GetRandomEntrance();
         if (currCellIndex != nextEntranceIndex)
         {
-            yield return CreatePathBetweenTwoEntrances(currCellIndex, nextEntranceIndex);
+            CreatePathBetweenTwoEntrances(currCellIndex, nextEntranceIndex);
         }
         //get random entrance from room 1, then from room 2
         //after that connect them
