@@ -7,18 +7,43 @@ using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class MazeGenerator : MonoBehaviour
 {
-    [SerializeField] private MazeCell[] MazeCellPrefab;
-    public MazeCell FarthestCell;
+    [Header("Config")]
+    [SerializeField] private bool generateWithStairs;
+    [SerializeField] private bool generateWithRooms;
+    [Tooltip("Will only be taken into account if fillTestWithHallways = true")]
+    [SerializeField] private bool generateWithEmpty;
+    [Tooltip("If no rest of the grid will be filled with EmptySpace blocks")]
+    [SerializeField] private bool fillRestWithHallways;
+    [SerializeField] Vector3Int mazeSize; //width, height, depth
+    [Tooltip("How big the cells are in x,z so that they are placed in the right amount of distance")]
+    [SerializeField] private float cellSize;
+    //[SerializeField] private float cellHight;
+    [SerializeField] private MazeFloor FloorPrefab;
+    private List<MazeFloor> FloorList = new List<MazeFloor>();
+
+    [Header("Hallways")]
+    [SerializeField] private MazeCell[] HallwayCellPrefab;
+    //public MazeCell FarthestCell;
     [SerializeField] private BossRoom BossRoomPrefab;
     [SerializeField] private TreasureRoom TreasureRoomPrefab;
-    [SerializeField] Vector3Int mazeSize; //width, height, depth
     private MazeCell[,,] mazeGrid;
-    [SerializeField] private float cellSize;
-    private int distanceToZero;
+
+    [Header("Staircase")]
+    [SerializeField] private int stairsAttempts;
+    [SerializeField] private int maxStairsAmount;
+    private int stairsAmount;
+    [Tooltip("The size of the Stairs Prefab in x and z direction (Note: don't need y cause stairs will always be 2 blocks high")]
+    [SerializeField] private Vector2Int stairsSize;
+    [SerializeField] private Staircase MazeStaircasePrefab;
+    [SerializeField] private MazeCell StairsEntrancePrefab;
+    [SerializeField] private MazeCell StairsPrefab;
+    [SerializeField] private MazeCell StairsPlaceholder;
+    [SerializeField] private List<Staircase> Staircases = new List<Staircase>();
 
     [Header("Rooms")]
-    [SerializeField] private bool generateWithRooms;
     [SerializeField] private int roomAttempts;
+    [SerializeField] Vector2Int roomMinSize;
+    [SerializeField] Vector2Int roomMaxSize;
     [SerializeField] private Room MazeRoomPrefab;
     [SerializeField] private MazeCell CornerPrefabLU;
     [SerializeField] private MazeCell CornerPrefabLO;
@@ -26,27 +51,14 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField] private MazeCell CornerPrefabRO;
     [SerializeField] private MazeCell WallPrefab;
     [SerializeField] private MazeCell MiddlePrefab;
-    [SerializeField] Vector2Int roomMinSize;
-    [SerializeField] Vector2Int roomMaxSize;
-    [SerializeField] private List<Room> Rooms = new List<Room>();
+    private List<Room> Rooms = new List<Room>();
 
     [Header("Empty Space")]
-    [SerializeField] private bool generateWithEmpty;
     [SerializeField] private int emptyAttempts;
     [SerializeField] private MazeCell EmptySpacePrefab;
     [SerializeField] Vector2Int emptyMinSize;
     [SerializeField] Vector2Int emptyMaxSize;
 
-    [Header("Staircase")]
-    [SerializeField] private bool generateWithStairs;
-    [SerializeField] private int stairsAttempts;
-    [SerializeField] private Staircase MazeStaircasePrefab;
-    [SerializeField] private MazeCell StairsEntrancePrefab;
-    [SerializeField] private MazeCell StairsPrefab;
-    [SerializeField] private MazeCell StairsPlaceholder;
-    [SerializeField] private int maxStairsAmount;
-    private int stairsAmount;
-    [SerializeField] private List<Staircase> Staircases = new List<Staircase>();
 
     public bool isValid;
     [Header("Entrance Stuff")]
@@ -64,22 +76,35 @@ public class MazeGenerator : MonoBehaviour
         cellSize *= transform.localScale.x;
         mazeGrid = new MazeCell[mazeSize.x, mazeSize.y * 2, mazeSize.z];
         entrancesOnOneLevel = new List<MazeCell>();
+
+        for (int fCount = 0; fCount < mazeSize.y; fCount++)
+        {
+            MazeFloor floor = Instantiate(
+                FloorPrefab, transform.position + (Vector3.up * cellSize * 2 * fCount),
+                Quaternion.identity, 
+                transform);
+            if (fCount > 1)
+            {
+                floor.ConnectPrev(FloorList[fCount - 2]);
+                FloorList[fCount - 2].ConnectNext(floor);
+            }
+            FloorList.Add(floor);
+        }
+
         if (generateWithStairs)
         {
-            CreateStaircase();
-            Debug.Log("Stairs generated");
+            CreateStaircases();
         }
         if (generateWithRooms)
         {
             GenerateRooms();
-            Debug.Log("Rooms generated");
             //yield return GenerateRooms();
         }
 
         mazeGrid[0, 0, 0] = Instantiate(
-            MazeCellPrefab[Random.Range(0, MazeCellPrefab.Length)],
-            new Vector3( 0, 0, 0) + transform.position,
-            Quaternion.identity, transform
+            HallwayCellPrefab[Random.Range(0, HallwayCellPrefab.Length)],
+            new Vector3(0, 0, 0) + transform.position,
+            Quaternion.identity, FloorList[0].transform.GetChild(2).transform
             );
         mazeGrid[0, 0, 0].SetIndex(0, 0, 0);
         mazeGrid[0, 0, 0].SetEntrance();
@@ -88,13 +113,13 @@ public class MazeGenerator : MonoBehaviour
 
         ConnectEntrances();
         //yield return ConnectEntrances();
-        if (generateWithEmpty)
+        if (generateWithEmpty && fillRestWithHallways)
         {
             GenerateEmpty();
             Debug.Log("Empty Spaces generated");
             //yield return GenerateEmpty();
         }
-        FillRestWithHallways();
+        FillRestOfGrid();
 
         for (int y = 0; y < mazeSize.y; y++)
         {
@@ -106,17 +131,19 @@ public class MazeGenerator : MonoBehaviour
                 }
             }
         }
-
         Debug.Log("Maze generated");
-        GenerateBossRoom();
-        GenerateTreasureRoom();
+
+        //GenerateBossRoom();
+        //GenerateTreasureRoom();
         CheckEntrancesForVisits();
         if (!isValid)
         {
             Debug.LogWarning("Maze not valid");
         }
+        DeleteUnusedSpaces();
+        DisableUpperFloors();
     }
-    private void FillRestWithHallways()
+    private void FillRestOfGrid()
     {
         for (int y = 0; y < mazeSize.y; y++)
         {
@@ -126,22 +153,38 @@ public class MazeGenerator : MonoBehaviour
                 {
                     if (mazeGrid[x, y, z] == null)
                     {
-                        mazeGrid[x, y, z] = Instantiate(
-                            /*MazeCellPrefab[Random.Range(0, MazeCellPrefab.Length)]*/ EmptySpacePrefab,
-                            new Vector3(
-                                x * cellSize,
-                                y * cellSize * 2,
-                                z * cellSize) + transform.position,
-                            Quaternion.identity, transform
-                            );
-                        mazeGrid[x, y, z].SetIndex(x, y, z);
-                        /*mazeGrid[x, y, z].SetType(MazeCell.CellType.Hallway) */ mazeGrid[x, y, z].SetType(MazeCell.CellType.EmptySpace);
-                        mazeGrid[x, y, z].Visit(); //when filled with empty
+                        if (fillRestWithHallways)
+                        {
+                            mazeGrid[x, y, z] = Instantiate(HallwayCellPrefab[Random.Range(0, HallwayCellPrefab.Length)],
+                                new Vector3(
+                                    x * cellSize,
+                                    y * cellSize * 2,
+                                    z * cellSize) + transform.position,
+                                Quaternion.identity, FloorList[y].transform.GetChild(2).transform
+                                );
+                            mazeGrid[x, y, z].SetIndex(x, y, z);
+                            mazeGrid[x, y, z].SetType(MazeCell.CellType.Hallway);
+                        }
+                        else
+                        {
+                            mazeGrid[x, y, z] = Instantiate(EmptySpacePrefab,
+                                new Vector3(
+                                    x * cellSize,
+                                    y * cellSize * 2,
+                                    z * cellSize) + transform.position,
+                                Quaternion.identity, FloorList[y].transform.GetChild(3).transform
+                                );
+                            mazeGrid[x, y, z].SetIndex(x, y, z);
+                            mazeGrid[x, y, z].SetType(MazeCell.CellType.EmptySpace);
+                            mazeGrid[x, y, z].Visit();
+                        }
                     }
                 }
             }
         }
     }
+
+    #region Generating rooms
     private void GenerateRooms()
     {
         int roomsCount = 0;
@@ -149,39 +192,40 @@ public class MazeGenerator : MonoBehaviour
         {
             for (int i = 0; i < roomAttempts; i++)
             {
-                Vector3Int roomSize = new Vector3Int(
+                Vector3Int size = new Vector3Int(
                     Random.Range(roomMinSize.x, roomMaxSize.x + 1),
                     1,
                     Random.Range(roomMinSize.y, roomMaxSize.y) + 1);
-                Vector3Int roomLocation = new Vector3Int(
-                    Random.Range(1, mazeSize.x - roomSize.x),
+                Vector3Int location = new Vector3Int(
+                    Random.Range(1, mazeSize.x - size.x),
                     mazeHight,
-                    Random.Range(1, mazeSize.z - roomSize.z));
-                if (roomLocation.x < 2 && roomLocation.z < 2)
+                    Random.Range(1, mazeSize.z - size.z));
+                if (location.x < 2 && location.z < 2)
                 {
-                    roomLocation.x += 2;
-                    roomLocation.z += 2;
+                    location.x += 2;
+                    location.z += 2;
                 }
-                if (!CheckOverlapping(roomLocation + new Vector3Int(-1, 0, -1), roomSize + new Vector3Int(2, 0, 2), MazeCell.CellType.None))
+                if (!CheckOverlapping(location + new Vector3Int(-1, 0, -1), size + new Vector3Int(2, 0, 2), MazeCell.CellType.None))
                 {
                     Room room = Instantiate(MazeRoomPrefab,
                         new Vector3(
-                            (roomLocation.x + roomSize.x / 2) * cellSize,
-                            (roomLocation.y + roomSize.y / 2) * cellSize * 2,
-                            (roomLocation.z + roomSize.z / 2) * cellSize)
-                        + transform.position, Quaternion.identity, transform);
+                            (location.x + size.x / 2) * cellSize,
+                            (location.y + size.y / 2) * cellSize * 2,
+                            (location.z + size.z / 2) * cellSize)
+                        + transform.position, Quaternion.identity, FloorList[location.y].transform.GetChild(1).transform);
                     Rooms.Add(room);
-                    room.roomPosition = roomLocation;
-                    room.roomSize = roomSize;
-                    GenerateRoomTiles(roomLocation, roomSize, roomsCount);
+                    room.roomPosition = location;
+                    room.roomSize = size;
+                    GenerateRoomTiles(location, size, roomsCount, room.transform);
                     roomsCount++;
                 }
                 //yield return new WaitForSeconds(0.1f);
             }
         }
         GenerateRoomEntrances();
+        Debug.Log("Rooms generated");
     }
-    private void GenerateRoomTiles(Vector3Int location, Vector3Int size, int roomCount)
+    private void GenerateRoomTiles(Vector3Int location, Vector3Int size, int roomCount, Transform roomTransform)
     {
         for (int xStep = 0; xStep < size.x; xStep++)
         {
@@ -192,7 +236,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(CornerPrefabLU,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.Euler(0, 90, 0), transform);
+                        Quaternion.Euler(0, 90, 0), roomTransform);
                     Rooms[roomCount].borderCells.Add(mazeGrid[location.x + xStep, location.y, location.z + zStep]);
                 }
                 //corner l-o
@@ -200,7 +244,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(CornerPrefabLO,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.Euler(0, 180, 0), transform);
+                        Quaternion.Euler(0, 180, 0), roomTransform);
                     Rooms[roomCount].borderCells.Add(mazeGrid[location.x + xStep, location.y, location.z + zStep]);
                 }
                 //corner r-u
@@ -208,7 +252,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(CornerPrefabRU,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.Euler(0, 0, 0), transform);
+                        Quaternion.Euler(0, 0, 0), roomTransform);
                     Rooms[roomCount].borderCells.Add(mazeGrid[location.x + xStep, location.y, location.z + zStep]);
                 }
                 //corner r-o
@@ -216,7 +260,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(CornerPrefabRO,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.Euler(0, 270, 0), transform);
+                        Quaternion.Euler(0, 270, 0), roomTransform);
                     Rooms[roomCount].borderCells.Add(mazeGrid[location.x + xStep, location.y, location.z + zStep]);
                 }
                 //wall left side
@@ -224,7 +268,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(WallPrefab,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.Euler(0, 90, 0), transform);
+                        Quaternion.Euler(0, 90, 0), roomTransform);
                     Rooms[roomCount].borderCells.Add(mazeGrid[location.x + xStep, location.y, location.z + zStep]);
                 }
                 //wall right side
@@ -232,7 +276,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(WallPrefab,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.Euler(0, 270, 0), transform);
+                        Quaternion.Euler(0, 270, 0), roomTransform);
                     Rooms[roomCount].borderCells.Add(mazeGrid[location.x + xStep, location.y, location.z + zStep]);
                 }
                 //wall bottom side
@@ -240,7 +284,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(WallPrefab,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.Euler(0, 0, 0), transform);
+                        Quaternion.Euler(0, 0, 0), roomTransform);
                     Rooms[roomCount].borderCells.Add(mazeGrid[location.x + xStep, location.y, location.z + zStep]);
                 }
                 //wall top side
@@ -248,7 +292,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(WallPrefab,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.Euler(0, 180, 0), transform);
+                        Quaternion.Euler(0, 180, 0), roomTransform);
                     Rooms[roomCount].borderCells.Add(mazeGrid[location.x + xStep, location.y, location.z + zStep]);
                 }
                 //center pieces
@@ -256,7 +300,7 @@ public class MazeGenerator : MonoBehaviour
                 {
                     mazeGrid[location.x + xStep, location.y, location.z + zStep] = Instantiate(MiddlePrefab,
                         new Vector3((location.x + xStep) * cellSize, location.y * cellSize * 2, (location.z + zStep) * cellSize) + transform.position,
-                        Quaternion.identity, transform);
+                        Quaternion.identity, roomTransform);
                 }
                 mazeGrid[location.x + xStep, location.y, location.z + zStep].SetIndex(location.x + xStep, location.y, location.z + zStep);
                 mazeGrid[location.x + xStep, location.y, location.z + zStep].SetType(MazeCell.CellType.Room);
@@ -277,39 +321,36 @@ public class MazeGenerator : MonoBehaviour
             Entrances.Add(Rooms[i].GetRandomEntrance());
         }
     }
+    #endregion
+
     private void GenerateEmpty()
     {
-        emptyAttempts /= mazeSize.y;
+        //emptyAttempts /= mazeSize.y;
         for (int mazeHight = 0; mazeHight < mazeSize.y; mazeHight++)
         {
             for (int i = 0; i < emptyAttempts; i++)
             {
-                Vector3Int emptySize = new Vector3Int(Random.Range(emptyMinSize.x, emptyMaxSize.x + 1),
+                Vector3Int size = new Vector3Int(Random.Range(emptyMinSize.x, emptyMaxSize.x + 1),
                     1,
                     Random.Range(emptyMinSize.y, emptyMaxSize.y + 1));
-                Vector3Int emptyLocation = new Vector3Int(
-                    Random.Range(0, mazeSize.x - emptySize.x),
+                Vector3Int location = new Vector3Int(
+                    Random.Range(0, mazeSize.x - size.x + 1),
                     mazeHight,
-                    Random.Range(0, mazeSize.z - emptySize.z));
-                if (emptyLocation.x < 2 && emptyLocation.z < 2)
+                    Random.Range(0, mazeSize.z - size.z + 1));
+                if (!CheckOverlapping(location, size, MazeCell.CellType.EmptySpace))
                 {
-                    emptyLocation.x += 2;
-                    emptyLocation.z += 2;
-                }
-                if (!CheckOverlapping(emptyLocation + new Vector3Int(-1, 0, -1), emptySize + new Vector3Int(2, 0, 2), MazeCell.CellType.EmptySpace))
-                {
-                    for (int x = 0; x < emptySize.x; x++)
+                    for (int x = 0; x < size.x; x++)
                     {
-                        for (int z = 0; z < emptySize.z; z++)
+                        for (int z = 0; z < size.z; z++)
                         {
-                            if (mazeGrid[emptyLocation.x + x, emptyLocation.y, emptyLocation.z + z] == null)
+                            if (mazeGrid[location.x + x, location.y, location.z + z] == null)
                             {
-                                mazeGrid[emptyLocation.x + x, emptyLocation.y, emptyLocation.z + z] = Instantiate(EmptySpacePrefab,
-                                    new Vector3((emptyLocation.x + x) * cellSize, emptyLocation.y * cellSize * 2, (emptyLocation.z + z) * cellSize) + transform.position,
-                                    Quaternion.identity, transform);
-                                mazeGrid[emptyLocation.x + x, emptyLocation.y, emptyLocation.z + z].SetIndex(emptyLocation.x + x, emptyLocation.y, emptyLocation.z + z);
-                                mazeGrid[emptyLocation.x + x, emptyLocation.y, emptyLocation.z + z].SetType(MazeCell.CellType.EmptySpace);
-                                mazeGrid[emptyLocation.x + x, emptyLocation.y, emptyLocation.z + z].Visit();
+                                mazeGrid[location.x + x, location.y, location.z + z] = Instantiate(EmptySpacePrefab,
+                                    new Vector3((location.x + x) * cellSize, location.y * cellSize * 2, (location.z + z) * cellSize) + transform.position,
+                                    Quaternion.identity, FloorList[location.y].transform.GetChild(3).transform);
+                                mazeGrid[location.x + x, location.y, location.z + z].SetIndex(location.x + x, location.y, location.z + z);
+                                mazeGrid[location.x + x, location.y, location.z + z].SetType(MazeCell.CellType.EmptySpace);
+                                mazeGrid[location.x + x, location.y, location.z + z].Visit();
                             }
                         }
                     }
@@ -318,39 +359,41 @@ public class MazeGenerator : MonoBehaviour
             }
         }
     }
-    private void CreateStaircase()
+
+    #region Generate stairs
+    private void CreateStaircases()
     {
+        Vector3Int size = new Vector3Int();
         for (int mazeHight = 0; mazeHight < mazeSize.y - 1; mazeHight++)
         {
             stairsAmount = 0;
             for (int i = 0; i < stairsAttempts; i++)
             {
-                Vector3Int stairsLocation = new Vector3Int(
+                Vector3Int location = new Vector3Int(
                     Random.Range(1, mazeSize.x - 5),
                     mazeHight,
                     Random.Range(1, mazeSize.z - 5));
-                int stairsVariant = Random.Range(0, 5);
-                Vector3Int stairsSize = new Vector3Int();
+                int stairsVariant = Random.Range(0, 4);
                 if (stairsVariant == 0 || stairsVariant == 2)
                 {
-                    stairsSize = new Vector3Int(1, 2, 5);
+                    size = new Vector3Int(stairsSize.x, 2, stairsSize.y + 2);
                 }
                 if (stairsVariant == 1 || stairsVariant == 3)
                 {
-                    stairsSize = new Vector3Int(5, 2, 1);
+                    size = new Vector3Int(stairsSize.y + 2, 2, stairsSize.x);
                 }
-                if (!CheckOverlapping(stairsLocation + new Vector3Int(-1, 0, -1), stairsSize + new Vector3Int(2, 0, 2), MazeCell.CellType.None))
+                if (!CheckOverlapping(location + new Vector3Int(-1, 0, -1), size + new Vector3Int(2, 0, 2), MazeCell.CellType.None))
                 {
                     Staircase staircase = Instantiate(MazeStaircasePrefab,
                         new Vector3(
-                            (stairsLocation.x) * cellSize,
-                            (stairsLocation.y) * cellSize * 2,
-                            (stairsLocation.z) * cellSize)
-                        + transform.position, Quaternion.identity, transform);
+                            (location.x) * cellSize,
+                            (location.y) * cellSize * 2,
+                            (location.z) * cellSize)
+                        + transform.position, Quaternion.identity, FloorList[location.y].transform.GetChild(0).transform);
                     Staircases.Add(staircase);
-                    staircase.staircasePosition = stairsLocation;
-                    staircase.staircaseSize = stairsSize;
-                    GenerateStairTiles(stairsLocation, stairsSize, stairsVariant);
+                    staircase.staircasePosition = location;
+                    staircase.staircaseSize = size;
+                    GenerateStairTiles(location, size, stairsVariant, staircase.transform);
                     stairsAmount++;
                 }
                 if (stairsAmount == maxStairsAmount)
@@ -359,10 +402,11 @@ public class MazeGenerator : MonoBehaviour
                 }
             }
         }
+        Debug.Log("Stairs generated");
     }
-    private void GenerateStairTiles(Vector3Int location, Vector3Int size, int variant)
+    private void GenerateStairTiles(Vector3Int location, Vector3Int size, int variant, Transform stairTransform)
     {
-        CreateStairsEntrances(location, variant);
+        CreateStairsEntrances(location, variant, stairTransform);
         for (int y = 0; y < size.y; y++)
         {
             for (int x = 0; x < size.x; x++)
@@ -373,7 +417,7 @@ public class MazeGenerator : MonoBehaviour
                     {
                         mazeGrid[location.x + x, location.y + y, location.z + z] = Instantiate(StairsPlaceholder,
                             new Vector3((location.x + x) * cellSize, (location.y + y) * cellSize * 2, (location.z + z) * cellSize) + transform.position,
-                            Quaternion.identity, transform);
+                            Quaternion.identity, stairTransform);
                         mazeGrid[location.x + x, location.y + y, location.z + z].SetIndex(location.x + x, y, location.z + z);
                         mazeGrid[location.x + x, location.y + y, location.z + z].SetType(MazeCell.CellType.Stairs);
                         mazeGrid[location.x + x, location.y + y, location.z + z].Visit();
@@ -384,7 +428,7 @@ public class MazeGenerator : MonoBehaviour
             }
         }
     }
-    private void CreateStairsEntrances(Vector3Int location, int stairsVariant)
+    private void CreateStairsEntrances(Vector3Int location, int stairsVariant, Transform stairTransform)
     {
         Vector3Int entrance1Location;
         Vector3Int entrance2Location;
@@ -395,9 +439,9 @@ public class MazeGenerator : MonoBehaviour
             entrance2Location = new Vector3Int(location.x, location.y + 1, location.z);
             stairsLocation = new Vector3Int(location.x, location.y, location.z + 3);
 
-            InstantiateStairsEntrance(entrance1Location, 0);
-            InstantiateStairsEntrance(entrance2Location, 2);
-            InstantiateStairs(stairsLocation, stairsVariant);
+            InstantiateStairsEntrance(entrance1Location, 0, stairTransform);
+            InstantiateStairsEntrance(entrance2Location, 2, stairTransform);
+            InstantiateStairs(stairsLocation, stairsVariant, stairTransform);
         }
         if (stairsVariant == 1)
         {
@@ -405,9 +449,9 @@ public class MazeGenerator : MonoBehaviour
             entrance2Location = new Vector3Int(location.x, location.y + 1, location.z);
             stairsLocation = new Vector3Int(location.x + 3, location.y, location.z);
 
-            InstantiateStairsEntrance(entrance1Location, 1);
-            InstantiateStairsEntrance(entrance2Location, 3);
-            InstantiateStairs(stairsLocation, stairsVariant);
+            InstantiateStairsEntrance(entrance1Location, 1, stairTransform);
+            InstantiateStairsEntrance(entrance2Location, 3, stairTransform);
+            InstantiateStairs(stairsLocation, stairsVariant, stairTransform);
         }
         if (stairsVariant == 2)
         {
@@ -415,9 +459,9 @@ public class MazeGenerator : MonoBehaviour
             entrance2Location = new Vector3Int(location.x, location.y + 1, location.z + 4);
             stairsLocation = new Vector3Int(location.x, location.y, location.z + 1);
 
-            InstantiateStairsEntrance(entrance1Location, 2);
-            InstantiateStairsEntrance(entrance2Location, 0);
-            InstantiateStairs(stairsLocation, stairsVariant);
+            InstantiateStairsEntrance(entrance1Location, 2, stairTransform);
+            InstantiateStairsEntrance(entrance2Location, 0, stairTransform);
+            InstantiateStairs(stairsLocation, stairsVariant, stairTransform);
         }
         if (stairsVariant == 3)
         {
@@ -425,16 +469,16 @@ public class MazeGenerator : MonoBehaviour
             entrance2Location = new Vector3Int(location.x + 4, location.y + 1, location.z);
             stairsLocation = new Vector3Int(location.x + 1, location.y, location.z);
 
-            InstantiateStairsEntrance(entrance1Location, 3);
-            InstantiateStairsEntrance(entrance2Location, 1);
-            InstantiateStairs(stairsLocation, stairsVariant);
+            InstantiateStairsEntrance(entrance1Location, 3, stairTransform);
+            InstantiateStairsEntrance(entrance2Location, 1, stairTransform);
+            InstantiateStairs(stairsLocation, stairsVariant, stairTransform);
         }
     }
-    private void InstantiateStairsEntrance(Vector3Int entranceLocation, int clearWall)
+    private void InstantiateStairsEntrance(Vector3Int entranceLocation, int clearWall, Transform stairTransform)
     {
         MazeCell mazeCell = Instantiate(StairsEntrancePrefab,
             new Vector3((entranceLocation.x) * cellSize, entranceLocation.y * cellSize * 2, (entranceLocation.z) * cellSize) + transform.position,
-            Quaternion.identity, transform);
+            Quaternion.identity, stairTransform);
         mazeGrid[entranceLocation.x, entranceLocation.y, entranceLocation.z] = mazeCell;
         mazeCell.SetEntrance();
         mazeCell.SetIndex(entranceLocation.x, entranceLocation.y, entranceLocation.z);
@@ -456,16 +500,18 @@ public class MazeGenerator : MonoBehaviour
             mazeCell.ClearRightWall();
         }
     }
-    private void InstantiateStairs(Vector3Int location, int variant)
+    private void InstantiateStairs(Vector3Int location, int variant, Transform stairTransform)
     {
         MazeCell mazeCell = Instantiate(StairsPrefab,
             new Vector3((location.x) * cellSize, location.y * cellSize * 2, (location.z) * cellSize) + transform.position,
-            Quaternion.Euler(0, 90 * variant, 0), transform);
+            Quaternion.Euler(0, 90 * variant, 0), stairTransform);
         mazeGrid[location.x, location.y, location.z] = mazeCell;
         mazeCell.Visit();
         mazeCell.SetIndex(location.x, location.y, location.z);
         mazeCell.SetType(MazeCell.CellType.Stairs);
     }
+    #endregion
+
     private bool CheckOverlapping(Vector3Int location, Vector3Int size, MazeCell.CellType ignoreType)
     {
         bool isOverlapping = false;
@@ -505,72 +551,8 @@ public class MazeGenerator : MonoBehaviour
         }
         return isOverlapping;
     }
-    private void GenerateBossRoom()
-    {
-        //find the room furthest from spawn at the max y axis
-        int roomWithMostDistance = 0;
-        int farthestRoomX = mazeSize.x - 1;
-        for (int x = 0; x < mazeSize.x; x++)
-        {
-            if (roomWithMostDistance < mazeGrid[x, 0, mazeSize.z - 1].distanceToSpawn)
-            {
-                roomWithMostDistance = mazeGrid[x, 0, mazeSize.z - 1].distanceToSpawn;
-                farthestRoomX = x;
-            }
-        }
-        //spawn Boss Room
-        BossRoom bossRoom = Instantiate(
-            BossRoomPrefab, 
-            new Vector3(farthestRoomX * cellSize, 0, mazeSize.z * cellSize) + transform.position, 
-            Quaternion.identity, transform);
-        mazeGrid[farthestRoomX, 0, mazeSize.z - 1].ClearFrontWall();
-    }
-    private void GenerateTreasureRoom()
-    {
-        TreasureRoom treasureRoom;
-        int randZ;
-        int intervall;
-        int amountPerZSide = (int)(mazeSize.z / cellSize);
-        if (amountPerZSide == 0)
-        {
-            intervall = 1;
-        }
-        else
-        {
-            intervall = mazeSize.z / amountPerZSide;
-        }
-        for (int z = 0; z < amountPerZSide; z++)
-        {
-            //room on right side
-            randZ = Random.Range(intervall * z, intervall * (z + 1));
-            treasureRoom = Instantiate(
-                TreasureRoomPrefab,
-                new Vector3(mazeSize.x * cellSize, 0, randZ * cellSize) + transform.position,
-                Quaternion.identity, transform);  
-            treasureRoom.ClearLeftWall();
-            mazeGrid[mazeSize.x - 1, 0, randZ].ClearRightWall();
 
-            //room on left side
-            randZ = Random.Range(intervall * z + 1, intervall * (z + 1));
-            treasureRoom = Instantiate(TreasureRoomPrefab,
-                new Vector3(-cellSize, 0, randZ * cellSize) + transform.position,
-                Quaternion.identity, transform);
-            treasureRoom.ClearRightWall();
-            mazeGrid[0, 0, randZ].ClearLeftWall();
-        }
-    }
-    private void CheckEntrancesForVisits()
-    {
-        for (int i = 0; i < Entrances.Count; i++)
-        {
-            if (!Entrances[i].isVisited)
-            {
-                StartCoroutine(GenerateMaze(null, mazeGrid[Entrances[i].Index.x, Entrances[i].Index.y, Entrances[i].Index.z]));
-                Debug.Log(Entrances[i]);
-                //break;
-            }
-        }
-    }
+    #region Connecting entrances
     private void ConnectEntrances()
     {
         for (int height = 0; height < mazeSize.y; height++)
@@ -580,7 +562,6 @@ public class MazeGenerator : MonoBehaviour
                 if (Entrances[x].Index.y == height)
                 {
                     entrancesOnOneLevel.Add(Entrances[x]);
-                    Debug.Log(Entrances[x].Index);
                 }
             }
             //here connect them (pathfinding -.-)
@@ -588,34 +569,33 @@ public class MazeGenerator : MonoBehaviour
             {
                 for (int i = 0; i < entrancesOnOneLevel.Count - 1; i++)
                 {
-                   CreatePathBetweenTwoEntrances(entrancesOnOneLevel[i].Index, entrancesOnOneLevel[i + 1].Index);
+                    CreatePathBetweenTwoEntrances(entrancesOnOneLevel[i].Index, entrancesOnOneLevel[i + 1].Index);
                 }
                 entrancesOnOneLevel.Clear();
                 lastdirection = 4;
-                Debug.Log("entrancesOnOneLevel got cleared");
             }
         }
+        Debug.Log("All entrances connected");
     }
     private void CreatePathBetweenTwoEntrances(Vector3Int currCellIndex, Vector3Int nextEntranceIndex)
     {
         currCellIndex = GetNextClosestCell(currCellIndex, nextEntranceIndex);
-        Debug.Log(currCellIndex + " " + nextEntranceIndex);
 
         if (mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z] == null)
         {
             mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z] = Instantiate(
-                            MazeCellPrefab[Random.Range(0, MazeCellPrefab.Length)],
+                            HallwayCellPrefab[Random.Range(0, HallwayCellPrefab.Length)],
                             new Vector3(
                                 currCellIndex.x * cellSize,
                                 currCellIndex.y * cellSize * 2,
                                 currCellIndex.z * cellSize) + transform.position,
-                            Quaternion.identity, transform
+                            Quaternion.identity, FloorList[currCellIndex.y].transform.GetChild(2).transform
                             );
             mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z].SetIndex(currCellIndex.x, currCellIndex.y, currCellIndex.z);
             mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z].SetType(MazeCell.CellType.Hallway);
         }
         //only one level for now
-        
+
         //yield return new WaitForSeconds(0.1f);
 
         //nextEntrance = Rooms[1].GetRandomEntrance();
@@ -633,25 +613,22 @@ public class MazeGenerator : MonoBehaviour
     }
     private Vector3Int GetNextClosestCell(Vector3Int currCellIndex, Vector3Int nextEntranceIndex)
     {
-        List <Vector3Int> freeCellIndex = new List<Vector3Int>();
+        List<Vector3Int> freeCellIndex = new List<Vector3Int>();
         Vector3Int nextCellIndex = new Vector3Int(0, 0, 0);
         if (lastdirection != 0) //only check front if not moved back
         {
             if (currCellIndex.z + 1 < mazeSize.z && mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z + 1] == null)
             {
                 freeCellIndex.Add(new Vector3Int(currCellIndex.x, currCellIndex.y, currCellIndex.z + 1));
-                Debug.Log("check front");
             }
             else if (currCellIndex.z + 1 < mazeSize.z && mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z + 1].type == MazeCell.CellType.Hallway)
             {
                 freeCellIndex.Add(new Vector3Int(currCellIndex.x, currCellIndex.y, currCellIndex.z + 1));
-                Debug.Log("check front hallway");
             }
             if (currCellIndex + new Vector3Int(0, 0, 1) == nextEntranceIndex)
             {
                 nextCellIndex = nextEntranceIndex;
                 lastdirection = 4;
-                Debug.Log("found entrance front");
                 return nextCellIndex;
             }
         }
@@ -660,18 +637,15 @@ public class MazeGenerator : MonoBehaviour
             if (currCellIndex.x + 1 < mazeSize.x && mazeGrid[currCellIndex.x + 1, currCellIndex.y, currCellIndex.z] == null)
             {
                 freeCellIndex.Add(new Vector3Int(currCellIndex.x + 1, currCellIndex.y, currCellIndex.z));
-                Debug.Log("check right");
             }
             else if (currCellIndex.x + 1 < mazeSize.x && mazeGrid[currCellIndex.x + 1, currCellIndex.y, currCellIndex.z].type == MazeCell.CellType.Hallway)
             {
                 freeCellIndex.Add(new Vector3Int(currCellIndex.x + 1, currCellIndex.y, currCellIndex.z));
-                Debug.Log("check right hallway");
             }
             if (currCellIndex + new Vector3Int(1, 0, 0) == nextEntranceIndex)
             {
                 nextCellIndex = nextEntranceIndex;
                 lastdirection = 4;
-                Debug.Log("found entrance right");
                 return nextCellIndex;
             }
         }
@@ -680,18 +654,15 @@ public class MazeGenerator : MonoBehaviour
             if (currCellIndex.z - 1 >= 0 && mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z - 1] == null)
             {
                 freeCellIndex.Add(new Vector3Int(currCellIndex.x, currCellIndex.y, currCellIndex.z - 1));
-                Debug.Log("check back");
             }
             else if (currCellIndex.z - 1 >= 0 && mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z - 1].type == MazeCell.CellType.Hallway)
             {
                 freeCellIndex.Add(new Vector3Int(currCellIndex.x, currCellIndex.y, currCellIndex.z - 1));
-                Debug.Log("check back hallway");
             }
             if (currCellIndex + new Vector3Int(0, 0, -1) == nextEntranceIndex)
             {
                 nextCellIndex = nextEntranceIndex;
                 lastdirection = 4;
-                Debug.Log("found entrance back");
                 return nextCellIndex;
             }
         }
@@ -700,18 +671,15 @@ public class MazeGenerator : MonoBehaviour
             if (currCellIndex.x - 1 >= 0 && mazeGrid[currCellIndex.x - 1, currCellIndex.y, currCellIndex.z] == null)
             {
                 freeCellIndex.Add(new Vector3Int(currCellIndex.x - 1, currCellIndex.y, currCellIndex.z));
-                Debug.Log("check left");
             }
             else if (currCellIndex.x - 1 >= 0 && mazeGrid[currCellIndex.x - 1, currCellIndex.y, currCellIndex.z].type == MazeCell.CellType.Hallway)
             {
                 freeCellIndex.Add(new Vector3Int(currCellIndex.x - 1, currCellIndex.y, currCellIndex.z));
-                Debug.Log("check left hallway");
             }
             if (currCellIndex + new Vector3Int(-1, 0, 0) == nextEntranceIndex)
             {
                 nextCellIndex = nextEntranceIndex;
                 lastdirection = 4;
-                Debug.Log("found entrance left");
                 return nextCellIndex;
             }
         }
@@ -738,7 +706,6 @@ public class MazeGenerator : MonoBehaviour
                 //move right
                 lastdirection = 3;
             }
-            Debug.Log(freeCellIndex.Count());
             float distance = Vector3.Distance(freeCellIndex[0], nextEntranceIndex);
             nextCellIndex = new Vector3Int(freeCellIndex[0].x, freeCellIndex[0].y, freeCellIndex[0].z);
             for (int i = 0; i < freeCellIndex.Count; i++)
@@ -770,9 +737,11 @@ public class MazeGenerator : MonoBehaviour
                 }
             }
         }
-        Debug.Log("direction: " + lastdirection);
         return nextCellIndex;
     }
+    #endregion
+
+    #region Generating maze
     private IEnumerator GenerateMaze(MazeCell prevCell, MazeCell currCell)
     {
         currCell.Visit();
@@ -789,7 +758,7 @@ public class MazeGenerator : MonoBehaviour
             {
                 yield return GenerateMaze(currCell, nextCell);
             }
-        }while (nextCell != null);
+        } while (nextCell != null);
     }
     private MazeCell GetNextUnvisitedCell(MazeCell currCell)
     {
@@ -836,7 +805,7 @@ public class MazeGenerator : MonoBehaviour
                 }
             }
         }
-        else if(currCell.type == MazeCell.CellType.Entrance)
+        else if (currCell.type == MazeCell.CellType.Entrance)
         {
             if (x + 1 < mazeSize.x)
             {
@@ -915,7 +884,7 @@ public class MazeGenerator : MonoBehaviour
             {
                 currCell.ClearLeftWall();
                 currCell.distanceToSpawn = 0;
-                FarthestCell = currCell;
+                //FarthestCell = currCell;
             }
             return;
         }
@@ -927,10 +896,10 @@ public class MazeGenerator : MonoBehaviour
                 prevCell.ClearRightWall();
             }
             currCell.distanceToSpawn = prevCell.distanceToSpawn + 1;
-            if (FarthestCell.distanceToSpawn < currCell.distanceToSpawn)
+            /*if (FarthestCell.distanceToSpawn < currCell.distanceToSpawn)
             {
                 FarthestCell = currCell;
-            }
+            }*/
             return;
         }
         if (prevCell.transform.position.x > currCell.transform.position.x)
@@ -941,10 +910,10 @@ public class MazeGenerator : MonoBehaviour
                 prevCell.ClearLeftWall();
             }
             currCell.distanceToSpawn = prevCell.distanceToSpawn + 1;
-            if (FarthestCell.distanceToSpawn < currCell.distanceToSpawn)
+            /*if (FarthestCell.distanceToSpawn < currCell.distanceToSpawn)
             {
                 FarthestCell = currCell;
-            }
+            }*/
             return;
         }
         if (prevCell.transform.position.z < currCell.transform.position.z)
@@ -955,10 +924,10 @@ public class MazeGenerator : MonoBehaviour
                 prevCell.ClearFrontWall();
             }
             currCell.distanceToSpawn = prevCell.distanceToSpawn + 1;
-            if (FarthestCell.distanceToSpawn < currCell.distanceToSpawn)
+            /*if (FarthestCell.distanceToSpawn < currCell.distanceToSpawn)
             {
                 FarthestCell = currCell;
-            }
+            }*/
             return;
         }
         if (prevCell.transform.position.z > currCell.transform.position.z)
@@ -969,11 +938,92 @@ public class MazeGenerator : MonoBehaviour
                 prevCell.ClearBackWall();
             }
             currCell.distanceToSpawn = prevCell.distanceToSpawn + 1;
-            if (FarthestCell.distanceToSpawn < currCell.distanceToSpawn)
+            /*if (FarthestCell.distanceToSpawn < currCell.distanceToSpawn)
             {
                 FarthestCell = currCell;
-            }
+            }*/
             return;
+        }
+    }
+    #endregion
+    private void CheckEntrancesForVisits()
+    {
+        for (int i = 0; i < Entrances.Count; i++)
+        {
+            if (!Entrances[i].isVisited)
+            {
+                StartCoroutine(GenerateMaze(null, mazeGrid[Entrances[i].Index.x, Entrances[i].Index.y, Entrances[i].Index.z]));
+                Debug.Log(Entrances[i]);
+                //break;
+            }
+        }
+    }
+    private void DeleteUnusedSpaces()
+    {
+        for (int i = 0; i < FloorList.Count; i++)
+        {
+            FloorList[i].DeleteUnusedSpace();
+        }
+    }
+    private void DisableUpperFloors()
+    {
+        for (int i = 2; i < FloorList.Count; ++i)
+        {
+            FloorList[i].gameObject.SetActive(false);
+        }
+    }
+    private void GenerateBossRoom()
+    {
+        //find the room furthest from spawn at the max y axis
+        int roomWithMostDistance = 0;
+        int farthestRoomX = mazeSize.x - 1;
+        for (int x = 0; x < mazeSize.x; x++)
+        {
+            if (roomWithMostDistance < mazeGrid[x, 0, mazeSize.z - 1].distanceToSpawn)
+            {
+                roomWithMostDistance = mazeGrid[x, 0, mazeSize.z - 1].distanceToSpawn;
+                farthestRoomX = x;
+            }
+        }
+        //spawn Boss Room
+        BossRoom bossRoom = Instantiate(
+            BossRoomPrefab,
+            new Vector3(farthestRoomX * cellSize, 0, mazeSize.z * cellSize) + transform.position,
+            Quaternion.identity, transform);
+        mazeGrid[farthestRoomX, 0, mazeSize.z - 1].ClearFrontWall();
+    }
+    private void GenerateTreasureRoom()
+    {
+        TreasureRoom treasureRoom;
+        int randZ;
+        int intervall;
+        int amountPerZSide = (int)(mazeSize.z / cellSize);
+        if (amountPerZSide == 0)
+        {
+            intervall = 1;
+        }
+        else
+        {
+            intervall = mazeSize.z / amountPerZSide;
+        }
+        for (int z = 0; z < amountPerZSide; z++)
+        {
+            //room on right side
+            randZ = Random.Range(intervall * z, intervall * (z + 1));
+            treasureRoom = Instantiate(
+                TreasureRoomPrefab,
+                new Vector3(mazeSize.x * cellSize, 0, randZ * cellSize) + transform.position,
+                Quaternion.identity, transform);
+            treasureRoom.ClearLeftWall();
+            mazeGrid[mazeSize.x - 1, 0, randZ].ClearRightWall();
+
+            //room on left side
+            randZ = Random.Range(intervall * z + 1, intervall * (z + 1));
+            treasureRoom = Instantiate(TreasureRoomPrefab,
+                new Vector3(-cellSize, 0, randZ * cellSize) + transform.position,
+                Quaternion.identity, transform);
+            treasureRoom.ClearRightWall();
+            mazeGrid[0, 0, randZ].ClearLeftWall();
         }
     }
     private void OnDrawGizmos()
