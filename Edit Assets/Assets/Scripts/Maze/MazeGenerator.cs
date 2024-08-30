@@ -47,10 +47,14 @@ public class MazeGenerator : MonoBehaviour
     private List<Staircase> Staircases = new List<Staircase>();
 
     [Header("Rooms")]
-    [SerializeField] private int roomAttempts;
-    [SerializeField] private int maxRoomAmount;
-    private int roomsAmount;
-    [SerializeField] private Room[] Rooms;
+    [SerializeField] private int normalRoomAttempts;
+    [SerializeField] private int maxNormalRoomAmount;
+    [SerializeField] private Room[] NormalRooms;
+
+    [Header("Monster Rooms")]
+    [SerializeField] private int monsterRoomAttempts;
+    [SerializeField] private int maxMonsterRoomAmount;
+    [SerializeField] private Room[] MonsterRooms;
 
     [Header("Empty Space")]
     [SerializeField] private int emptyAttempts;
@@ -159,7 +163,9 @@ public class MazeGenerator : MonoBehaviour
         }
         if (generateWithRooms)
         {
-            GenerateRooms();
+            GenerateRooms(MonsterRooms, monsterRoomAttempts, maxMonsterRoomAmount);
+            yield return new WaitForSeconds(1);
+            GenerateRooms(NormalRooms, normalRoomAttempts, maxNormalRoomAmount);
             yield return new WaitForSeconds(1);
             //yield return GenerateRooms();
         }
@@ -245,14 +251,14 @@ public class MazeGenerator : MonoBehaviour
     }
 
     #region Generating rooms
-    private void GenerateRooms()
+    private void GenerateRooms(Room[] RoomArray, int attempts, int maxAmount)
     {
         for (int mazeHight = 0; mazeHight < mazeSize.y; mazeHight++)
         {
-            roomsAmount = 0;
-            for (int i = 0; i < roomAttempts; i++)
+            int roomsAmount = 0;
+            for (int i = 0; i < attempts; i++)
             {
-                Room room = Rooms[Random.Range(0, Rooms.Length)];
+                Room room = RoomArray[Random.Range(0, RoomArray.Length)];
                 Vector3Int size = room.roomSize;
                 Vector3Int location = new Vector3Int(
                     Random.Range(0, mazeSize.x - size.x),
@@ -275,7 +281,7 @@ public class MazeGenerator : MonoBehaviour
                     GenerateRoomTiles(location, size, room);
                     roomsAmount++;
                 }
-                if (roomsAmount == maxRoomAmount)
+                if (roomsAmount == maxAmount)
                 {
                     break;
                 }

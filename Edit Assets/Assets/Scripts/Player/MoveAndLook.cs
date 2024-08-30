@@ -70,6 +70,10 @@ public class MoveAndLook : MonoBehaviour, IDataPersistence
         {
             Debug.Log("load player position saved in: " + sceneName);
             spawnPosition = data.PlayerPosition[sceneName];
+            if (sceneName == "Terrain")
+            {
+                spawnPosition = Vector3.zero;
+            }
         }
         else
         {
