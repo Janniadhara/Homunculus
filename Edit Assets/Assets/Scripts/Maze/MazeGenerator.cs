@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using Unity.VisualScripting;
 using Unity.AI.Navigation;
 
 public class MazeGenerator : MonoBehaviour
@@ -28,7 +27,8 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField] private int saveEveryYFloor;
 
     [Header("Hallways")]
-    [SerializeField] private MazeCell[] HallwayCellPrefab;
+    [SerializeField] private MazeCell[] HallwayCells;
+    [SerializeField] private MazeCell[] SpecialHallwayCells;
     //public MazeCell FarthestCell;
     [SerializeField] private BossRoom BossRoomPrefab;
     [SerializeField] private TreasureRoom TreasureRoomPrefab;
@@ -76,6 +76,7 @@ public class MazeGenerator : MonoBehaviour
 
     IEnumerator Start()
     {
+        Random.InitState(15);
         isValid = true;
         cellSize *= transform.localScale.x;
         mazeGrid = new MazeCell[mazeSize.x, mazeSize.y * 2, mazeSize.z];
@@ -88,7 +89,7 @@ public class MazeGenerator : MonoBehaviour
         {
             transform.position = new Vector3(0, 0, 0);
         }
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
         for (int fCount = 0; fCount < mazeSize.y; fCount++)
         {
             MazeFloor floor = Instantiate(
@@ -121,7 +122,7 @@ public class MazeGenerator : MonoBehaviour
                 Entrances.Add(mazeGrid[mazeSize.x - 1, srCount * saveEveryYFloor - 1, mazeSize.z - 1]);
             }
         }
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
         #endregion
 
         #region main entrance 
@@ -153,35 +154,35 @@ public class MazeGenerator : MonoBehaviour
             mazeGrid[0, 0, 0].distanceToSpawn = 0;
             Entrances.Add(mazeGrid[0, 0, 0]);
         }
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
         #endregion
 
         if (generateWithStairs)
         {
             CreateStaircases();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.1f);
         }
         if (generateWithRooms)
         {
             GenerateRooms(MonsterRooms, monsterRoomAttempts, maxMonsterRoomAmount);
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.1f);
             GenerateRooms(NormalRooms, normalRoomAttempts, maxNormalRoomAmount);
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.1f);
             //yield return GenerateRooms();
         }
 
         ConnectEntrances();
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
         //yield return ConnectEntrances();
         if (generateWithEmpty && fillRestWithHallways)
         {
             GenerateEmpty();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.1f);
             Debug.Log("Empty Spaces generated");
             //yield return GenerateEmpty();
         }
         FillRestOfGrid();
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
 
         for (int y = 0; y < mazeSize.y; y++)
         {
@@ -203,10 +204,10 @@ public class MazeGenerator : MonoBehaviour
             Debug.LogWarning("Maze not valid");
         }
         DeleteUnusedSpaces();
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
         //yield return new WaitForSeconds(1);
         NavMesh.BuildNavMesh();
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.1f);
         DisableUpperFloors();
     }
     private void FillRestOfGrid()
@@ -221,7 +222,7 @@ public class MazeGenerator : MonoBehaviour
                     {
                         if (fillRestWithHallways)
                         {
-                            mazeGrid[x, y, z] = Instantiate(HallwayCellPrefab[Random.Range(0, HallwayCellPrefab.Length)],
+                            mazeGrid[x, y, z] = Instantiate(HallwayCells[Random.Range(0, HallwayCells.Length)],
                                 new Vector3(
                                     x * cellSize,
                                     y * cellSize * 2,
@@ -637,7 +638,7 @@ public class MazeGenerator : MonoBehaviour
         if (mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z] == null)
         {
             mazeGrid[currCellIndex.x, currCellIndex.y, currCellIndex.z] = Instantiate(
-                            HallwayCellPrefab[Random.Range(0, HallwayCellPrefab.Length)],
+                            HallwayCells[Random.Range(0, HallwayCells.Length)],
                             new Vector3(
                                 currCellIndex.x * cellSize,
                                 currCellIndex.y * cellSize * 2,

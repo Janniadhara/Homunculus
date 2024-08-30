@@ -168,8 +168,12 @@ MonoBehaviour:
   RightDoor: {fileID: 0}
   FrontDoor: {fileID: 0}
   BackDoor: {fileID: 0}
+  LeftPillar: {fileID: 0}
+  RightPillar: {fileID: 0}
+  FrontPillar: {fileID: 0}
+  BackPillar: {fileID: 0}
   UnvisitedBlock: {fileID: 0}
   EntranceBlock: {fileID: 0}
   Index: {x: 0, y: 0, z: 0}
   distanceToSpawn: 0
-  type: 0
+  type: 3

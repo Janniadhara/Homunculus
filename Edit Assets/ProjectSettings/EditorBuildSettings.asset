@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/DungeonGoblin.unity
     guid: 74698aa5af39c1840986fce5a9e480a0
+  - enabled: 1
+    path: Assets/Scenes/Terrain.unity
+    guid: 74907f6a94866944687aa9ab901dbcb1
   - enabled: 0
     path: Assets/Scenes/ModularArmor.unity
     guid: 00d476e129eabdf408fbb008144c63cb
