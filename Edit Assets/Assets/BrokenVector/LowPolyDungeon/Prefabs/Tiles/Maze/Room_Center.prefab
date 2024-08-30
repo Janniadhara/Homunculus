@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1988585822111387890}
-  - component: {fileID: 6795984771089666622}
   m_Layer: 0
   m_Name: UnvisitedBlock
   m_TagString: Untagged
@@ -33,27 +32,6 @@ Transform:
   - {fileID: 8263405000019983641}
   m_Father: {fileID: 1025258518622695124}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &6795984771089666622
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4382508283239817015}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 4, y: 4, z: 4}
-  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1 &5235666957057679978
 GameObject:
   m_ObjectHideFlags: 0
@@ -183,11 +161,15 @@ MonoBehaviour:
   RightDoor: {fileID: 0}
   FrontDoor: {fileID: 0}
   BackDoor: {fileID: 0}
+  LeftPillar: {fileID: 0}
+  RightPillar: {fileID: 0}
+  FrontPillar: {fileID: 0}
+  BackPillar: {fileID: 0}
   UnvisitedBlock: {fileID: 4382508283239817015}
   EntranceBlock: {fileID: 0}
   Index: {x: 0, y: 0, z: 0}
   distanceToSpawn: 0
-  type: 0
+  type: 1
 --- !u!1 &6847117139135125392
 GameObject:
   m_ObjectHideFlags: 0

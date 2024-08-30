@@ -36,6 +36,8 @@ public class GameData
     public float musicVolume;
     public float effectVolume;
 
+    //Dungeons
+
     //Quests
     public SerializableDictionary<string, QuestData> QuestData;
 

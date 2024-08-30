@@ -13,14 +13,22 @@ public class MazeCell : MonoBehaviour
         EmptySpace,
         Entrance
     }
+    [Header("Walls")]
     [SerializeField] private GameObject LeftWall;
     [SerializeField] private GameObject RightWall;
     [SerializeField] private GameObject FrontWall;
     [SerializeField] private GameObject BackWall;
+    [Header("Doors")]
     [SerializeField] private GameObject LeftDoor;
     [SerializeField] private GameObject RightDoor;
     [SerializeField] private GameObject FrontDoor;
     [SerializeField] private GameObject BackDoor;
+    [Header("Pillars")]
+    [SerializeField] private GameObject LeftPillar;
+    [SerializeField] private GameObject RightPillar;
+    [SerializeField] private GameObject FrontPillar;
+    [SerializeField] private GameObject BackPillar;
+    [Header("Rest")]
     [SerializeField] private GameObject UnvisitedBlock;
     [SerializeField] private GameObject EntranceBlock;
     private bool isEntrance;
@@ -48,6 +56,10 @@ public class MazeCell : MonoBehaviour
         {
             LeftDoor.SetActive(true);
         }
+        if (LeftPillar != null)
+        {
+            LeftPillar.SetActive(true);
+        }
     }
     public void ClearRightWall()
     {
@@ -58,6 +70,10 @@ public class MazeCell : MonoBehaviour
         if (isEntrance && RightDoor != null)
         {
             RightDoor.SetActive(true);
+        }
+        if (RightPillar != null)
+        {
+            RightPillar.SetActive(true);
         }
     }
     public void ClearFrontWall()
@@ -70,6 +86,10 @@ public class MazeCell : MonoBehaviour
         {
             FrontDoor.SetActive(true);
         }
+        if (FrontPillar != null)
+        {
+            FrontPillar.SetActive(true);
+        }
     }
     public void ClearBackWall()
     {
@@ -80,6 +100,10 @@ public class MazeCell : MonoBehaviour
         if (isEntrance && BackDoor != null)
         {
             BackDoor.SetActive(true);
+        }
+        if (BackPillar != null)
+        {
+            BackPillar.SetActive(true);
         }
     }
     public void SetEntrance()
