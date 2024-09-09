@@ -8,4 +8,13 @@ public class AttachedItem : MonoBehaviour
     public int amount;
     public InventoryObject InventoryObj;
     public List<InventorySlot> InventoryList;
+
+    private void OnMouseEnter()
+    {
+        Debug.Log(item.description);
+    }
+    private void OnMouseExit()
+    {
+        Debug.Log("exit hover");
+    }
 }

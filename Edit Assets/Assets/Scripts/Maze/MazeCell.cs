@@ -52,7 +52,7 @@ public class MazeCell : MonoBehaviour
         {
             LeftWall.SetActive(false);
         }
-        if (isEntrance && LeftDoor != null)
+        if (LeftDoor != null)
         {
             LeftDoor.SetActive(true);
         }
@@ -67,7 +67,7 @@ public class MazeCell : MonoBehaviour
         {
             RightWall.SetActive(false);
         }
-        if (isEntrance && RightDoor != null)
+        if (RightDoor != null)
         {
             RightDoor.SetActive(true);
         }
@@ -82,7 +82,7 @@ public class MazeCell : MonoBehaviour
         {
             FrontWall.SetActive(false);
         }
-        if (isEntrance && FrontDoor != null)
+        if (FrontDoor != null)
         {
             FrontDoor.SetActive(true);
         }
@@ -97,7 +97,7 @@ public class MazeCell : MonoBehaviour
         {
             BackWall.SetActive(false);
         }
-        if (isEntrance && BackDoor != null)
+        if (BackDoor != null)
         {
             BackDoor.SetActive(true);
         }

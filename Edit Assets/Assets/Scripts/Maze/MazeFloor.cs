@@ -19,11 +19,11 @@ public class MazeFloor : MonoBehaviour
     //    scale: mazeSize.x * cellSize,
     //           2,
     //           mazeSize.z * cellSize)
-    public void SetTrigger(Vector3Int mazeSize, float cellSize)
+    public void SetTrigger(Vector3Int mazeSize, float cellSize, float hight)
     {
         TriggerAreaUp.transform.position = new Vector3(
             (transform.position.x + mazeSize.x) * cellSize / 2 - cellSize / 2,
-            transform.position.y + cellSize * 1.9f,
+            transform.position.y + cellSize * (hight * 0.9f),
             (transform.position.z + mazeSize.z) * cellSize / 2 - cellSize / 2);
         TriggerAreaUp.transform.localScale = new Vector3(
             mazeSize.x * cellSize / transform.parent.localScale.x,
@@ -31,7 +31,7 @@ public class MazeFloor : MonoBehaviour
             mazeSize.z * cellSize / transform.parent.localScale.z);
         TriggerAreaDown.transform.position = new Vector3(
             (transform.position.x + mazeSize.x) * cellSize / 2 - cellSize / 2,
-            transform.position.y + cellSize * 1.3f,
+            transform.position.y + cellSize* 1.5f,
             (transform.position.z + mazeSize.z) * cellSize / 2 - cellSize / 2);
         TriggerAreaDown.transform.localScale = new Vector3(
             mazeSize.x * cellSize / transform.parent.localScale.x,

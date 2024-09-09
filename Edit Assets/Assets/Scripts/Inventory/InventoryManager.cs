@@ -1,10 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class InventoryManager : MonoBehaviour, IDataPersistence
 {
     [SerializeField] private ItemDatabaseObject Itemdatabase;
+    //public GameObject ItemDisplayPrefab;
+    [SerializeField] private UiItemDisplay ItemDisplayPrefab;
+    [SerializeField] private UiItemName ItemNamePrefab;
+    private UiItemName itemName;
+    [SerializeField] private Canvas PlayerCanvas;
 
     [Header("Player Inventory")]
     [SerializeField] private InventoryObject PlayerInventory;
@@ -70,43 +77,51 @@ public class InventoryManager : MonoBehaviour, IDataPersistence
     //open or close depending on screen state and return that value
     public void OpenPlayerInventory()
     {
+        RemoveChildren(PlayerItemDisplay);
+        CreateNewItemDisplay(PlayerInventory.InventoryList, PlayerItemDisplay);
         PlayerInvScreen.SetActive(true);
-        PlayerItemDisplay.GetComponent<InventoryItemDisplay>().CreateDisplay(PlayerInventory.InventoryList);
     }
     public void ClosePlayerInventory()
     {
         PlayerInvScreen.SetActive(false);
+        HideItemName();
     }
     public void OpenChestInventory(List<InventorySlot> chestInventory)
     {
-        ChestInvScreen.SetActive(true);
-        ChestItemDisplay.GetComponent<InventoryItemDisplay>().CreateDisplay(chestInventory);
         ChestInventoryList = chestInventory;
+        RemoveChildren(ChestItemDisplay);
+        CreateNewItemDisplay(ChestInventoryList, ChestItemDisplay);
+        ChestInvScreen.SetActive(true);
     }
     public void CloseChestInventory()
     {
         ChestInvScreen.SetActive(false);
+        HideItemName();
     }
     public void SwapItems(List<InventorySlot> inventory, ItemObject item, int amount)
     {
+        bool isInChest = false;
         if (ChestInvScreen.activeSelf)
         {
             if (inventory == PlayerInventory.InventoryList)
             {
-                PlayerInventory.RemoveItem(item);
+                PlayerInventory.RemoveItemAmount(item, amount);
                 //check if item already exists in the chest
                 for (int i = 0; i < ChestInventoryList.Count; i++)
                 {
                     if (ChestInventoryList[i].item == item)
                     {
-                        ChestInventoryList[i].amount += amount;
-                        RefreshItemDisplays();
+                        ChestInventoryList[i].AddAmount(amount);
+                        isInChest = true;
                         //EventsManager.Instance.pickUpItemEvent.ItemPickUp(item, -amount);
-                        return;
+                        break;
                     }
                 }
-                ChestInventoryList.Add(new InventorySlot(item.itemId, item, amount));
-                //EventsManager.Instance.pickUpItemEvent.ItemPickUp(item, -amount);
+                if (!isInChest)
+                {
+                    ChestInventoryList.Add(new InventorySlot(item.itemId, item, amount));
+                    //EventsManager.Instance.pickUpItemEvent.ItemPickUp(item, -amount);
+                }
             }
             else
             {
@@ -115,19 +130,22 @@ public class InventoryManager : MonoBehaviour, IDataPersistence
                 {
                     if (ChestInventoryList[i].item == item)
                     {
-                        ChestInventoryList.RemoveAt(i);
+                        ChestInventoryList[i].RemoveAmount(amount);
+                        if (ChestInventoryList[i].amount <= 0)
+                        {
+                            ChestInventoryList.RemoveAt(i);
+                        }
                     }
                 }
                 //EventsManager.Instance.pickUpItemEvent.ItemPickUp(item, amount);
             }
-            RefreshItemDisplays();
+            RemoveChildren(PlayerItemDisplay);
+            CreateNewItemDisplay(PlayerInventory.InventoryList, PlayerItemDisplay);
+            RemoveChildren(ChestItemDisplay);
+            CreateNewItemDisplay(ChestInventoryList, ChestItemDisplay);
+            HideItemName();
         }
         EventsManager.Instance.pickUpItemEvent.PlayerInvChanged();
-    }
-    private void RefreshItemDisplays()
-    {
-        PlayerItemDisplay.GetComponent<InventoryItemDisplay>().CreateDisplay(PlayerInventory.InventoryList);
-        ChestItemDisplay.GetComponent<InventoryItemDisplay>().CreateDisplay(ChestInventoryList);
     }
     public void EquipWeapon()
     {
@@ -141,6 +159,56 @@ public class InventoryManager : MonoBehaviour, IDataPersistence
             CurrentWeapon.GetComponent<Rigidbody>().useGravity = false;
             CurrentWeapon.GetComponent<Rigidbody>().isKinematic = true;
             CurrentWeapon.GetComponentInChildren<MeshCollider>().enabled = false;
+        }
+    }
+    void RemoveChildren(GameObject parent)
+    {
+        for (int i = 0; i < parent.transform.childCount; i++)
+        {
+            Destroy(parent.transform.GetChild(i).gameObject);
+        }
+    }
+    private void CreateNewItemDisplay(List<InventorySlot> inventoryList, GameObject itemDisplayParent)
+    {
+        for (int i = 0; i < inventoryList.Count; i++)
+        {
+            UiItemDisplay itemDisplay = Instantiate(ItemDisplayPrefab, itemDisplayParent.transform);
+            itemDisplay.GetItemInfos(inventoryList[i].item, inventoryList[i].amount, inventoryList);
+        }
+        /*
+         * GameObject ItemPrefab = Instantiate(ItemDisplayPrefab, itemDisplay.transform);
+        Image image = ItemPrefab.transform.GetChild(1).GetComponent<Image>();
+        TextMeshProUGUI amount = ItemPrefab.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
+        var ItemScript = ItemPrefab.transform.GetComponent<AttachedItem>();
+        //display these in the itemdisplay
+        image.sprite = inv.item.Picture;
+        amount.text = inv.amount.ToString();
+        //attatch itemdata to itemdisplay
+        ItemScript.item = inv.item;
+        ItemScript.amount = inv.amount;
+        ItemScript.InventoryList = invName;
+        ItemPrefab.GetComponent<Button>().onClick.AddListener(delegate
+        {
+            //LookTargetScript.SwapItems(ItemScript.InventoryList, ItemScript.item, ItemScript.amount);
+            InventoryManager.Instance.SwapItems(ItemScript.InventoryList, ItemScript.item, ItemScript.amount);
+        });
+        */
+    }
+    public void ShowItemName(ItemObject item, Transform itemPic)
+    {
+        Vector3 itemNamePos = itemPic.position + new Vector3(-27.5f, 0, 0);
+        if (itemName != null)
+        {
+            Destroy(itemName.gameObject);
+        }
+        itemName = Instantiate(ItemNamePrefab, itemNamePos, Quaternion.identity, PlayerCanvas.transform);
+        itemName.SetItemName(item.itemName);
+    }
+    public void HideItemName()
+    {
+        if (itemName != null)
+        {
+            Destroy(itemName.gameObject);
         }
     }
 }

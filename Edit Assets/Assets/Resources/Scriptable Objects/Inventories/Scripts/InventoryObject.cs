@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Inventory", menuName = "Inventory System/Inventory")]
+[CreateAssetMenu(fileName = "New Inventory", menuName = "Inventory System/Default Inventory")]
 public class InventoryObject : ScriptableObject
 {
     public ItemDatabaseObject ItemDatabase;
@@ -34,6 +34,7 @@ public class InventoryObject : ScriptableObject
                 InventoryList.Remove(InventoryList[i]);
             }
         }
+        InventoryList.Sort(SortById);
     }
     public void RemoveItemAmount(ItemObject item, int amountRemoved)
     {
@@ -41,14 +42,16 @@ public class InventoryObject : ScriptableObject
         {
             if (InventoryList[i].item == item)
             {
-                InventoryList[i].amount -= amountRemoved;
                 //InventoryList.RemoveAt(i);
-                if (InventoryList[i].amount <= 0)
+                if (InventoryList[i].amount <= amountRemoved)
                 {
                     InventoryList.Remove(InventoryList[i]);
+                    return;
                 }
+                InventoryList[i].RemoveAmount(amountRemoved);
             }
         }
+        InventoryList.Sort(SortById);
     }
 
     public void SortItems()
@@ -76,5 +79,9 @@ public class InventorySlot
     public void AddAmount(int added)
     {
         amount += added;
+    }
+    public void RemoveAmount(int removed)
+    {
+        amount -= removed;
     }
 }
